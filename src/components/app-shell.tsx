@@ -72,54 +72,64 @@ export function AppShell({ children }: { children: ReactNode }) {
           </p>
         </div>
 
-        <nav className="navigation">
-          {navigationItems.map((item) => {
-            const active = pathname === item.href;
+        <div className="sidebar-section">
+          <p className="sidebar-label">Navegacao</p>
+          <nav className="navigation">
+            {navigationItems.map((item) => {
+              const active = pathname === item.href;
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={active ? 'navigation__item navigation__item--active' : 'navigation__item'}
-              >
-                <strong>{item.label}</strong>
-                <span>{item.description}</span>
-              </Link>
-            );
-          })}
-        </nav>
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={
+                    active ? 'navigation__item navigation__item--active' : 'navigation__item'
+                  }
+                >
+                  <strong>{item.label}</strong>
+                  <span>{item.description}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
 
-        <div className="sidebar-stack">
-          <div className="sidebar-tile">
-            <span>Solicitacoes abertas</span>
-            <strong>{openRequests}</strong>
-          </div>
-          <div className="sidebar-tile">
-            <span>Tasks bloqueadas</span>
-            <strong>{blockedTasks}</strong>
-          </div>
-          <div className="sidebar-tile">
-            <span>Areas engajadas</span>
-            <strong>{engagedDepartments}</strong>
+        <div className="sidebar-section">
+          <p className="sidebar-label">Pulso da operacao</p>
+          <div className="sidebar-stack">
+            <div className="sidebar-tile">
+              <span>Solicitacoes abertas</span>
+              <strong>{openRequests}</strong>
+            </div>
+            <div className="sidebar-tile">
+              <span>Tasks bloqueadas</span>
+              <strong>{blockedTasks}</strong>
+            </div>
+            <div className="sidebar-tile">
+              <span>Areas engajadas</span>
+              <strong>{engagedDepartments}</strong>
+            </div>
           </div>
         </div>
       </aside>
 
       <div className="shell__canvas">
-        <header className="topbar">
-          <div>
-            <p className="eyebrow">Sprint 01 · Concepcao e prototipo</p>
-            <h2 className="topbar__title">{currentPage.title}</h2>
-            <p className="topbar__summary">{currentPage.summary}</p>
-          </div>
+        <div className="shell__content">
+          <header className="topbar">
+            <div className="topbar__main">
+              <p className="eyebrow">Sprint 01 | Concepcao e prototipo</p>
+              <h2 className="topbar__title">{currentPage.title}</h2>
+              <p className="topbar__summary">{currentPage.summary}</p>
+            </div>
 
-          <div className="topbar__meta">
-            <span>Stakeholders foco</span>
-            <strong>Diretoria, TI, RH, Financeiro e Operacoes</strong>
-          </div>
-        </header>
+            <div className="topbar__meta">
+              <span>Stakeholders foco</span>
+              <strong>Diretoria, TI, RH, Financeiro e Operacoes</strong>
+            </div>
+          </header>
 
-        <main className="shell__content">{children}</main>
+          <main className="shell__main">{children}</main>
+        </div>
       </div>
     </div>
   );

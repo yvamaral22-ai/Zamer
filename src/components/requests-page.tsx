@@ -1,18 +1,24 @@
 'use client';
 
-import { useEffect, useDeferredValue, useState, useTransition } from 'react';
+import { useDeferredValue, useEffect, useState, useTransition } from 'react';
 
 import { usePrototype } from '@/components/prototype-provider';
 import {
   AccentButton,
   DepartmentPill,
   GhostButton,
+  MetricCard,
   Panel,
   PriorityPill,
   SectionHeader,
   StatusPill,
 } from '@/components/ui';
-import { formatShortDate, relativeSlaText } from '@/lib/formatters';
+import {
+  formatShortDate,
+  isCriticalDeadline,
+  isOpenRequest,
+  relativeSlaText,
+} from '@/lib/formatters';
 import type { NewRequestInput, RequestStatus } from '@/lib/types';
 
 type RequestFilter = RequestStatus | 'Todas';
@@ -36,12 +42,6 @@ export function RequestsPage() {
   const [form, setForm] = useState(initialForm);
   const [isPending, startTransition] = useTransition();
 
-  useEffect(() => {
-    if (!selectedId && requests[0]) {
-      setSelectedId(requests[0].id);
-    }
-  }, [requests, selectedId]);
-
   const filteredRequests = requests.filter((request) => {
     const matchesStatus = statusFilter === 'Todas' || request.status === statusFilter;
     const normalizedQuery = deferredQuery.trim().toLowerCase();
@@ -54,14 +54,40 @@ export function RequestsPage() {
     return matchesStatus && matchesQuery;
   });
 
+  useEffect(() => {
+    if (filteredRequests.length === 0) {
+      return;
+    }
+
+    const selectedStillVisible = filteredRequests.some((request) => request.id === selectedId);
+
+    if (!selectedStillVisible) {
+      setSelectedId(filteredRequests[0].id);
+    }
+  }, [filteredRequests, selectedId]);
+
   const selectedRequest =
-    filteredRequests.find((request) => request.id === selectedId) ??
-    requests.find((request) => request.id === selectedId) ??
-    filteredRequests[0];
+    filteredRequests.find((request) => request.id === selectedId) ?? filteredRequests[0];
 
   const relatedTasks = selectedRequest
     ? tasks.filter((task) => task.requestId === selectedRequest.id)
     : [];
+
+  const selectedDepartment = selectedRequest
+    ? departments.find((department) => department.id === selectedRequest.departmentId)
+    : undefined;
+
+  const openRequests = requests.filter((request) => isOpenRequest(request.status)).length;
+  const urgentRequests = requests.filter(
+    (request) =>
+      isOpenRequest(request.status) &&
+      (request.priority === 'Alta' ||
+        request.priority === 'Critica' ||
+        isCriticalDeadline(request.dueAt)),
+  ).length;
+  const validationRequests = requests.filter(
+    (request) => request.status === 'Validacao',
+  ).length;
 
   function updateForm<K extends keyof NewRequestInput>(
     field: K,
@@ -106,6 +132,24 @@ export function RequestsPage() {
           </GhostButton>
         }
       />
+
+      <div className="metric-grid">
+        <MetricCard
+          label="Solicitacoes abertas"
+          value={String(openRequests)}
+          note="Demandas ainda em andamento no fluxo"
+        />
+        <MetricCard
+          label="Fila prioritaria"
+          value={String(urgentRequests)}
+          note="Itens de alta criticidade ou prazo curto"
+        />
+        <MetricCard
+          label="Em validacao"
+          value={String(validationRequests)}
+          note="Demandas aguardando aceite final"
+        />
+      </div>
 
       {showComposer ? (
         <Panel>
@@ -224,48 +268,56 @@ export function RequestsPage() {
             </select>
           </div>
 
-          <div className="request-list">
-            {filteredRequests.map((request) => {
-              const department = departments.find(
-                (departmentItem) => departmentItem.id === request.departmentId,
-              );
-
-              return (
-                <button
-                  key={request.id}
-                  type="button"
-                  onClick={() => setSelectedId(request.id)}
-                  className={
-                    request.id === selectedRequest?.id
-                      ? 'request-row request-row--active'
-                      : 'request-row'
-                  }
-                >
-                  <div className="request-row__main">
-                    <div className="request-row__header">
-                      <strong>{request.title}</strong>
-                      <PriorityPill value={request.priority} />
-                    </div>
-                    <p>{request.requester}</p>
-                    <div className="meta-row">
-                      {department ? <DepartmentPill department={department} /> : null}
-                      <StatusPill value={request.status} />
-                      <span>{relativeSlaText(request.dueAt)}</span>
-                    </div>
-                  </div>
-                </button>
-              );
-            })}
+          <div className="list-summary">
+            <span>{filteredRequests.length} resultados exibidos</span>
+            <span>Selecione uma solicitacao para abrir o contexto completo</span>
           </div>
+
+          {filteredRequests.length > 0 ? (
+            <div className="request-list">
+              {filteredRequests.map((request) => {
+                const department = departments.find(
+                  (departmentItem) => departmentItem.id === request.departmentId,
+                );
+
+                return (
+                  <button
+                    key={request.id}
+                    type="button"
+                    onClick={() => setSelectedId(request.id)}
+                    className={
+                      request.id === selectedRequest?.id
+                        ? 'request-row request-row--active'
+                        : 'request-row'
+                    }
+                  >
+                    <div className="request-row__main">
+                      <div className="request-row__header">
+                        <strong>{request.title}</strong>
+                        <PriorityPill value={request.priority} />
+                      </div>
+                      <p>{request.requester}</p>
+                      <div className="meta-row">
+                        {department ? <DepartmentPill department={department} /> : null}
+                        <StatusPill value={request.status} />
+                        <span>{relativeSlaText(request.dueAt)}</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="empty-state">Nenhuma solicitacao encontrada com os filtros atuais.</p>
+          )}
         </Panel>
 
-        <Panel>
-          {selectedRequest ? (
-            <>
+        {selectedRequest ? (
+          <div className="stack-layout">
+            <Panel>
               <SectionHeader
                 eyebrow={selectedRequest.id}
                 title={selectedRequest.title}
-                description={selectedRequest.description}
                 action={
                   <AccentButton
                     onClick={handleAdvance}
@@ -278,6 +330,16 @@ export function RequestsPage() {
                 }
               />
 
+              <p className="panel-copy">{selectedRequest.description}</p>
+
+              <div className="tag-row">
+                {selectedDepartment ? <DepartmentPill department={selectedDepartment} /> : null}
+                <StatusPill value={selectedRequest.status} />
+                <PriorityPill value={selectedRequest.priority} />
+                <span className="tag">Prazo {formatShortDate(selectedRequest.dueAt)}</span>
+                <span className="tag">Aberta em {formatShortDate(selectedRequest.openedAt)}</span>
+              </div>
+
               <div className="detail-grid">
                 <div className="detail-block">
                   <span className="detail-block__label">Responsavel</span>
@@ -288,23 +350,27 @@ export function RequestsPage() {
                   <strong>{selectedRequest.requester}</strong>
                 </div>
                 <div className="detail-block">
-                  <span className="detail-block__label">Prazo</span>
+                  <span className="detail-block__label">Prazo final</span>
                   <strong>{formatShortDate(selectedRequest.dueAt)}</strong>
                 </div>
                 <div className="detail-block">
-                  <span className="detail-block__label">Status</span>
-                  <StatusPill value={selectedRequest.status} />
+                  <span className="detail-block__label">SLA</span>
+                  <strong>{relativeSlaText(selectedRequest.dueAt)}</strong>
                 </div>
               </div>
 
-              <div className="tag-row">
-                {selectedRequest.tags.map((tag) => (
-                  <span className="tag" key={tag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              {selectedRequest.tags.length > 0 ? (
+                <div className="tag-row">
+                  {selectedRequest.tags.map((tag) => (
+                    <span className="tag" key={tag}>
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </Panel>
 
+            <Panel>
               <div className="detail-stack">
                 <SectionHeader
                   eyebrow="Dependencias"
@@ -321,7 +387,7 @@ export function RequestsPage() {
                             <StatusPill value={task.status} />
                           </div>
                           <p>
-                            {task.assignee} · prazo {formatShortDate(task.dueAt)} · esforco{' '}
+                            {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforco{' '}
                             {task.effort}
                           </p>
                         </div>
@@ -332,13 +398,15 @@ export function RequestsPage() {
                   <p className="empty-state">Nenhuma task vinculada encontrada.</p>
                 )}
               </div>
-            </>
-          ) : (
+            </Panel>
+          </div>
+        ) : (
+          <Panel>
             <p className="empty-state">
               Selecione uma solicitacao para visualizar os detalhes.
             </p>
-          )}
-        </Panel>
+          </Panel>
+        )}
       </div>
     </div>
   );
