@@ -402,6 +402,12 @@ label {
   max-width: 100%;
 }
 
+.meta-row > *,
+.task-card__header > *,
+.board__column-header > * {
+  min-width: 0;
+}
+
 .metric-grid {
   display: grid;
   gap: 1.25rem;
@@ -642,11 +648,16 @@ label {
 .department-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.45rem;
   padding: 0.42rem 0.72rem;
   border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 700;
+  max-width: 100%;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
 }
 
 .status-pill {
@@ -787,10 +798,10 @@ label {
 .board {
   display: grid;
   gap: 1rem;
-  grid-template-columns: repeat(4, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   align-items: start;
-  overflow-x: auto;
-  padding-bottom: 0.35rem;
+  overflow-x: visible;
+  padding-bottom: 0.1rem;
 }
 
 .board__column {
@@ -798,15 +809,28 @@ label {
   min-width: 0;
 }
 
+.board__column-header {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.board__column-header strong {
+  flex: 0 0 auto;
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
 .board__column-header h3 {
   margin: 0.35rem 0 0;
   font-size: 1.2rem;
+  overflow-wrap: anywhere;
 }
 
 .task-card {
   display: grid;
   gap: 0.75rem;
   padding: 1rem;
+  min-width: 0;
 }
 
 .task-card--risk {
@@ -819,6 +843,11 @@ label {
   justify-content: space-between;
   gap: 0.75rem;
   align-items: start;
+  flex-wrap: wrap;
+}
+
+.task-card__header strong {
+  flex: 1 1 11rem;
 }
 
 .task-card__warning {
@@ -827,7 +856,8 @@ label {
 }
 
 .select-inline {
-  min-width: 220px;
+  width: min(100%, 280px);
+  min-width: min(220px, 100%);
 }
 
 .spotlight-grid {
@@ -850,6 +880,14 @@ label {
 .meta-row {
   flex-wrap: wrap;
   justify-content: flex-start;
+}
+
+.task-card__actions {
+  flex-wrap: wrap;
+}
+
+.task-card__actions .button {
+  flex: 1 1 8.5rem;
 }
 
 .request-row__header strong,
@@ -895,11 +933,19 @@ label {
 
   .board {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    overflow-x: visible;
   }
 }
 
 @media (max-width: 1024px) {
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-header__action {
+    width: 100%;
+  }
+
   .section-grid,
   .section-grid--wide {
     grid-template-columns: 1fr;
