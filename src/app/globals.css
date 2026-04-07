@@ -15,6 +15,12 @@
   --content-max: 1340px;
   --radius-md: 20px;
   --radius-lg: 28px;
+  --scrollbar-track: rgba(58, 47, 35, 0.08);
+  --scrollbar-thumb: rgba(82, 68, 50, 0.34);
+  --scrollbar-thumb-strong: rgba(82, 68, 50, 0.5);
+  --scrollbar-track-inverse: rgba(255, 255, 255, 0.05);
+  --scrollbar-thumb-inverse: rgba(255, 248, 238, 0.2);
+  --scrollbar-thumb-inverse-strong: rgba(255, 248, 238, 0.32);
 }
 
 * {
@@ -107,6 +113,69 @@ label {
   height: 100vh;
   overflow-y: auto;
   min-width: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb-inverse) var(--scrollbar-track-inverse);
+  scrollbar-gutter: stable;
+}
+
+.shell__sidebar::-webkit-scrollbar,
+.request-list::-webkit-scrollbar,
+.board::-webkit-scrollbar {
+  width: 0.78rem;
+  height: 0.78rem;
+}
+
+.shell__sidebar::-webkit-scrollbar-track,
+.request-list::-webkit-scrollbar-track,
+.board::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.shell__sidebar::-webkit-scrollbar-thumb,
+.request-list::-webkit-scrollbar-thumb,
+.board::-webkit-scrollbar-thumb {
+  min-height: 3rem;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+
+.shell__sidebar::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-inverse);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.request-list::-webkit-scrollbar,
+.board::-webkit-scrollbar {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+.request-list,
+.board {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.request-list::-webkit-scrollbar-thumb,
+.board::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  box-shadow: inset 0 0 0 1px rgba(41, 33, 22, 0.12);
+}
+
+.shell__sidebar:hover::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-inverse-strong);
+}
+
+.request-list:hover::-webkit-scrollbar-thumb,
+.board:hover::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-strong);
+}
+
+.shell__sidebar::-webkit-scrollbar-corner,
+.request-list::-webkit-scrollbar-corner,
+.board::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .brand-block {
