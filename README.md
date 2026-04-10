@@ -43,6 +43,9 @@ docs/
   05-validacao.md
   06-casos-de-uso.md
   07-arquitetura.md
+  08-relatorio-analise-processo.md
+  09-analise-stakeholders.md
+  10-modelagem-processo-atual-bpmn.md
 ```
 
 ## Artefatos tecnicos
@@ -56,6 +59,9 @@ Os principais artefatos do projeto ficam em `docs/`:
 - [05-validacao.md](./docs/05-validacao.md)
 - [06-casos-de-uso.md](./docs/06-casos-de-uso.md)
 - [07-arquitetura.md](./docs/07-arquitetura.md)
+- [08-relatorio-analise-processo.md](./docs/08-relatorio-analise-processo.md)
+- [09-analise-stakeholders.md](./docs/09-analise-stakeholders.md)
+- [10-modelagem-processo-atual-bpmn.md](./docs/10-modelagem-processo-atual-bpmn.md)
 
 ## Como rodar
 
