@@ -202,9 +202,12 @@ label {
 .brand-block__title {
   margin: 0.65rem 0 0.45rem;
   max-width: 100%;
-  font-size: clamp(1.9rem, 2.6vw, 2.6rem);
-  line-height: 0.98;
-  overflow-wrap: anywhere;
+  font-size: clamp(1.6rem, 7.4vw, 2.6rem);
+  line-height: 1;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
+  text-wrap: balance;
 }
 
 .brand-block__copy {
@@ -212,7 +215,9 @@ label {
   max-width: 22ch;
   color: rgba(255, 248, 238, 0.7);
   line-height: 1.6;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .sidebar-section {
@@ -327,7 +332,9 @@ label {
   max-width: 16ch;
   font-size: clamp(1.95rem, 3.4vw, 3.5rem);
   line-height: 0.98;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
   text-wrap: balance;
 }
 
@@ -336,7 +343,9 @@ label {
   margin: 0;
   color: var(--muted);
   line-height: 1.55;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .topbar__meta {
@@ -357,6 +366,9 @@ label {
 .topbar__meta strong {
   color: var(--foreground);
   max-width: 28ch;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .workspace {
@@ -385,7 +397,9 @@ label {
   margin: 0.45rem 0 0.35rem;
   font-size: clamp(1.5rem, 2vw, 2.1rem);
   line-height: 1.05;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
   text-wrap: balance;
 }
 
@@ -394,7 +408,9 @@ label {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .section-header__action {
@@ -590,7 +606,9 @@ label {
   margin: 0;
   color: var(--muted);
   line-height: 1.6;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .detail-grid {
@@ -823,7 +841,9 @@ label {
 .board__column-header h3 {
   margin: 0.35rem 0 0;
   font-size: 1.2rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .task-card {
@@ -874,7 +894,9 @@ label {
 .department-row__metrics span {
   color: var(--muted);
   font-size: 0.88rem;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .meta-row {
@@ -895,7 +917,9 @@ label {
 .task-card__header strong,
 .department-row__metrics strong,
 .detail-block strong {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: none;
 }
 
 .reveal {
@@ -986,5 +1010,35 @@ label {
   .department-row__metrics {
     justify-items: start;
     text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .shell__sidebar,
+  .shell__canvas {
+    padding-inline: 1rem;
+  }
+
+  .brand-block,
+  .topbar,
+  .panel,
+  .metric-card,
+  .request-row,
+  .task-card,
+  .department-row {
+    padding: 1rem;
+  }
+
+  .brand-block__title {
+    font-size: clamp(1.5rem, 9vw, 2.15rem);
+  }
+
+  .topbar__title {
+    max-width: 100%;
+    font-size: clamp(1.7rem, 8.8vw, 2.5rem);
+  }
+
+  .section-header__title {
+    font-size: clamp(1.35rem, 7vw, 1.8rem);
   }
 }
