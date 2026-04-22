@@ -2,24 +2,28 @@
 
 ## Requisitos funcionais
 
-- RF01: o sistema deve permitir cadastrar uma nova solicitacao interna
-- RF02: o sistema deve registrar prioridade, prazo, solicitante e area responsavel
-- RF03: o sistema deve permitir acompanhar o status de cada solicitacao
-- RF04: o sistema deve criar ou vincular tarefas operacionais a cada solicitacao
-- RF05: o sistema deve permitir mover tarefas entre etapas de execucao
-- RF06: o sistema deve exibir indicadores resumidos da operacao
-- RF07: o sistema deve registrar atualizacoes entre departamentos
-- RF08: o sistema deve manter historico das movimentacoes relevantes
-- RF09: o sistema deve permitir filtrar e buscar solicitacoes
-- RF10: o sistema deve permitir visualizar detalhes da solicitacao selecionada
+| Identificador | Descricao do requisito | Prioridade |
+|---|---|---|
+| RF01 | o sistema deve permitir cadastrar uma nova solicitacao interna | Alta |
+| RF02 | o sistema deve registrar prioridade, prazo, solicitante e area responsavel em cada solicitacao | Alta |
+| RF03 | o sistema deve permitir acompanhar o status de cada solicitacao ao longo do fluxo | Alta |
+| RF04 | o sistema deve criar ou vincular tarefas operacionais a cada solicitacao | Alta |
+| RF05 | o sistema deve permitir mover tarefas entre etapas de execucao | Alta |
+| RF06 | o sistema deve exibir indicadores resumidos da operacao no dashboard | Media |
+| RF07 | o sistema deve registrar atualizacoes entre departamentos em um mural compartilhado | Media |
+| RF08 | o sistema deve manter historico das movimentacoes relevantes de cada solicitacao | Alta |
+| RF09 | o sistema deve permitir filtrar e buscar solicitacoes por criterios como status, prioridade e area | Media |
+| RF10 | o sistema deve permitir visualizar os detalhes da solicitacao selecionada | Alta |
 
 ## Requisitos nao funcionais
 
-- RNF01: a interface deve ser intuitiva e responsiva
-- RNF02: as informacoes principais devem ser localizadas em poucos cliques
-- RNF03: o sistema deve manter consistencia visual entre as telas
-- RNF04: o prototipo deve possuir tempo de carregamento baixo em ambiente local
-- RNF05: a arquitetura deve permitir evolucao futura para persistencia real
+| Identificador | Categoria | Descricao do requisito |
+|---|---|---|
+| RNF01 | Usabilidade | a interface deve ser intuitiva e responsiva, permitindo uso adequado em desktop e dispositivos moveis |
+| RNF02 | Usabilidade | as informacoes principais devem ser localizadas em poucos cliques, facilitando o acompanhamento das solicitacoes |
+| RNF03 | Consistencia visual | o sistema deve manter padrao visual e de navegacao entre dashboard, solicitacoes, tarefas e departamentos |
+| RNF04 | Desempenho | o prototipo deve apresentar baixo tempo de carregamento em ambiente local para nao comprometer a demonstracao do fluxo |
+| RNF05 | Manutenibilidade | a arquitetura deve permitir evolucao futura para persistencia real e integracao com backend sem reestruturacao completa |
 
 ## Regras de negocio
 
