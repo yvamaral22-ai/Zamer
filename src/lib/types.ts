@@ -21,6 +21,7 @@ export type TaskStatus =
   | 'Concluida';
 
 export type UpdateAudience = 'Todos' | 'Gestores' | 'Operacional';
+export type CommentEntity = 'request' | 'task';
 
 export type Department = {
   id: DepartmentId;
@@ -66,6 +67,16 @@ export type UpdateItem = {
   createdAt: string;
 };
 
+export type CommentItem = {
+  id: string;
+  entityType: CommentEntity;
+  entityId: string;
+  departmentId: DepartmentId;
+  author: string;
+  message: string;
+  createdAt: string;
+};
+
 export type ActivityKind = 'request' | 'task' | 'update';
 
 export type ActivityItem = {
@@ -81,6 +92,7 @@ export type PrototypeState = {
   requests: RequestItem[];
   tasks: TaskItem[];
   updates: UpdateItem[];
+  comments: CommentItem[];
   activities: ActivityItem[];
 };
 
@@ -96,6 +108,25 @@ export type NewRequestInput = {
 export type NewUpdateInput = {
   departmentId: DepartmentId;
   audience: UpdateAudience;
+  author: string;
+  message: string;
+};
+
+export type UpdateRequestInput = {
+  id: string;
+  title: string;
+  requester: string;
+  departmentId: DepartmentId;
+  priority: RequestPriority;
+  dueAt: string;
+  description: string;
+  owner: string;
+};
+
+export type NewCommentInput = {
+  entityType: CommentEntity;
+  entityId: string;
+  departmentId: DepartmentId;
   author: string;
   message: string;
 };

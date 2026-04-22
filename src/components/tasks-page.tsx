@@ -1,23 +1,182 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 
 import { usePrototype } from '@/components/prototype-provider';
 import {
+  AccentButton,
   DepartmentPill,
   GhostButton,
   Panel,
   SectionHeader,
   StatusPill,
 } from '@/components/ui';
-import { formatShortDate, isCriticalDeadline, relativeSlaText } from '@/lib/formatters';
+import {
+  formatDateTime,
+  formatShortDate,
+  isCriticalDeadline,
+  relativeSlaText,
+} from '@/lib/formatters';
 import { taskStatusOrder } from '@/lib/prototype-data';
-import type { DepartmentId, TaskStatus } from '@/lib/types';
+import type { CommentItem, Department, DepartmentId, TaskItem, TaskStatus } from '@/lib/types';
 
 type DepartmentFilter = DepartmentId | 'Todas';
 
+function TaskBoardCard({
+  comments,
+  department,
+  isPending,
+  onAddComment,
+  onMoveTask,
+  requestTitle,
+  task,
+}: {
+  comments: CommentItem[];
+  department?: Department;
+  isPending: boolean;
+  onAddComment: (task: TaskItem, input: { author: string; message: string }) => void;
+  onMoveTask: (
+    task: TaskItem,
+    direction: 'back' | 'forward',
+    input?: { author: string; message: string },
+  ) => void;
+  requestTitle: string;
+  task: TaskItem;
+}) {
+  const [commentForm, setCommentForm] = useState({
+    author: task.assignee,
+    message: '',
+  });
+
+  useEffect(() => {
+    setCommentForm({
+      author: task.assignee,
+      message: '',
+    });
+  }, [task.id, task.assignee]);
+
+  const isRisk = task.status === 'Bloqueada' || isCriticalDeadline(task.dueAt);
+  const index = taskStatusOrder.indexOf(task.status as TaskStatus);
+  const nextStatus = taskStatusOrder[Math.min(index + 1, taskStatusOrder.length - 1)];
+  const hasCommentMessage = commentForm.message.trim().length > 0;
+
+  return (
+    <article className={isRisk ? 'task-card task-card--risk' : 'task-card'}>
+      <div className="task-card__header">
+        <strong>{task.title}</strong>
+        <StatusPill value={task.status} />
+      </div>
+
+      <p>{requestTitle}</p>
+
+      <div className="meta-row">
+        {department ? <DepartmentPill department={department} /> : null}
+        <span>{task.assignee}</span>
+      </div>
+
+      <div className="meta-row">
+        <span>Prazo {formatShortDate(task.dueAt)}</span>
+        <span>{relativeSlaText(task.dueAt)}</span>
+      </div>
+
+      {task.blockedReason ? <p className="task-card__warning">{task.blockedReason}</p> : null}
+
+      <div className="task-card__comment-stack">
+        <label className="task-card__field">
+          Autor do comentario
+          <input
+            value={commentForm.author}
+            onChange={(event) =>
+              setCommentForm((current) => ({
+                ...current,
+                author: event.target.value,
+              }))
+            }
+            placeholder="Quem esta atualizando a task"
+          />
+        </label>
+
+        <label className="task-card__field">
+          Contexto da etapa
+          <textarea
+            value={commentForm.message}
+            onChange={(event) =>
+              setCommentForm((current) => ({
+                ...current,
+                message: event.target.value,
+              }))
+            }
+            placeholder="Ex.: Implementacao em andamento, testes iniciados e dependencia externa ainda pendente."
+            rows={3}
+          />
+        </label>
+      </div>
+
+      {comments.length > 0 ? (
+        <div className="task-card__history">
+          {comments.slice(0, 2).map((comment) => (
+            <article className="feed-item" key={comment.id}>
+              <div className="feed-item__content">
+                <div className="feed-item__header">
+                  <strong>{comment.author}</strong>
+                  <span>{formatDateTime(comment.createdAt)}</span>
+                </div>
+                <p>{comment.message}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : null}
+
+      <div className="task-card__actions">
+        <GhostButton
+          type="button"
+          disabled={isPending || !hasCommentMessage}
+          onClick={() => {
+            onAddComment(task, {
+              author: commentForm.author.trim() || task.assignee,
+              message: commentForm.message.trim(),
+            });
+            setCommentForm((current) => ({
+              ...current,
+              message: '',
+            }));
+          }}
+        >
+          Registrar comentario
+        </GhostButton>
+
+        <GhostButton
+          type="button"
+          disabled={isPending || index === 0}
+          onClick={() => onMoveTask(task, 'back')}
+        >
+          Voltar
+        </GhostButton>
+
+        <AccentButton
+          type="button"
+          disabled={isPending || index === taskStatusOrder.length - 1 || !hasCommentMessage}
+          onClick={() => {
+            onMoveTask(task, 'forward', {
+              author: commentForm.author.trim() || task.assignee,
+              message: commentForm.message.trim(),
+            });
+            setCommentForm((current) => ({
+              ...current,
+              message: '',
+            }));
+          }}
+        >
+          {nextStatus === 'Concluida' ? 'Concluir com contexto' : 'Avancar com contexto'}
+        </AccentButton>
+      </div>
+    </article>
+  );
+}
+
 export function TasksPage() {
-  const { departments, moveTask, requests, tasks } = usePrototype();
+  const { addComment, comments, departments, moveTask, requests, tasks } = usePrototype();
   const [departmentFilter, setDepartmentFilter] = useState<DepartmentFilter>('Todas');
   const [isPending, startTransition] = useTransition();
 
@@ -31,9 +190,28 @@ export function TasksPage() {
     (task) => task.status !== 'Concluida' && isCriticalDeadline(task.dueAt),
   ).length;
 
-  function shiftTask(taskId: string, direction: 'back' | 'forward') {
+  function handleAddTaskComment(
+    task: TaskItem,
+    input: { author: string; message: string },
+  ) {
     startTransition(() => {
-      moveTask(taskId, direction);
+      addComment({
+        entityType: 'task',
+        entityId: task.id,
+        departmentId: task.departmentId,
+        author: input.author,
+        message: input.message,
+      });
+    });
+  }
+
+  function handleMoveTask(
+    task: TaskItem,
+    direction: 'back' | 'forward',
+    input?: { author: string; message: string },
+  ) {
+    startTransition(() => {
+      moveTask(task.id, direction, input);
     });
   }
 
@@ -42,7 +220,7 @@ export function TasksPage() {
       <SectionHeader
         eyebrow="Execucao rastreavel"
         title="Quadro de tarefas por etapa"
-        description="O quadro organiza dependencias do fluxo e deixa claro quando uma entrega trava outra area."
+        description="Cada card agora aceita comentario de andamento antes de avancar ou concluir a execucao."
         action={
           <select
             className="select-inline"
@@ -97,50 +275,22 @@ export function TasksPage() {
                     (departmentItem) => departmentItem.id === task.departmentId,
                   );
                   const request = requests.find((requestItem) => requestItem.id === task.requestId);
-                  const isRisk = task.status === 'Bloqueada' || isCriticalDeadline(task.dueAt);
-                  const index = taskStatusOrder.indexOf(task.status as TaskStatus);
+                  const taskComments = comments.filter(
+                    (comment) =>
+                      comment.entityType === 'task' && comment.entityId === task.id,
+                  );
 
                   return (
-                    <article
-                      className={isRisk ? 'task-card task-card--risk' : 'task-card'}
+                    <TaskBoardCard
+                      comments={taskComments}
+                      department={department}
+                      isPending={isPending}
                       key={task.id}
-                    >
-                      <div className="task-card__header">
-                        <strong>{task.title}</strong>
-                        <StatusPill value={task.status} />
-                      </div>
-
-                      <p>{request?.title ?? 'Solicitacao vinculada'}</p>
-
-                      <div className="meta-row">
-                        {department ? <DepartmentPill department={department} /> : null}
-                        <span>{task.assignee}</span>
-                      </div>
-
-                      <div className="meta-row">
-                        <span>Prazo {formatShortDate(task.dueAt)}</span>
-                        <span>{relativeSlaText(task.dueAt)}</span>
-                      </div>
-
-                      {task.blockedReason ? (
-                        <p className="task-card__warning">{task.blockedReason}</p>
-                      ) : null}
-
-                      <div className="task-card__actions">
-                        <GhostButton
-                          disabled={isPending || index === 0}
-                          onClick={() => shiftTask(task.id, 'back')}
-                        >
-                          Voltar
-                        </GhostButton>
-                        <GhostButton
-                          disabled={isPending || index === taskStatusOrder.length - 1}
-                          onClick={() => shiftTask(task.id, 'forward')}
-                        >
-                          Avancar
-                        </GhostButton>
-                      </div>
-                    </article>
+                      onAddComment={handleAddTaskComment}
+                      onMoveTask={handleMoveTask}
+                      requestTitle={request?.title ?? 'Solicitacao vinculada'}
+                      task={task}
+                    />
                   );
                 })}
 

@@ -1,7 +1,9 @@
 import type {
   ActivityItem,
+  CommentItem,
   Department,
   DepartmentId,
+  NewCommentInput,
   NewRequestInput,
   NewUpdateInput,
   PrototypeState,
@@ -227,6 +229,29 @@ const seededUpdates: UpdateItem[] = [
   },
 ];
 
+const seededComments: CommentItem[] = [
+  {
+    id: 'COM-6001',
+    entityType: 'request',
+    entityId: 'REQ-1003',
+    departmentId: 'ti',
+    author: 'Nina Costa',
+    message:
+      'Mapeamento do canal atual concluido e configuracao da fila unica em andamento.',
+    createdAt: '2026-04-06T10:10:00',
+  },
+  {
+    id: 'COM-6002',
+    entityType: 'task',
+    entityId: 'TSK-3002',
+    departmentId: 'operacoes',
+    author: 'Paula Mendes',
+    message:
+      'Checklist parcial revisado. A equipe segue aguardando aprovacao financeira para liberar a etapa seguinte.',
+    createdAt: '2026-04-06T11:35:00',
+  },
+];
+
 const seededActivities: ActivityItem[] = [
   {
     id: 'ACT-7001',
@@ -260,6 +285,10 @@ function cloneTasks(items: TaskItem[]) {
 }
 
 function cloneUpdates(items: UpdateItem[]) {
+  return items.map((item) => ({ ...item }));
+}
+
+function cloneComments(items: CommentItem[]) {
   return items.map((item) => ({ ...item }));
 }
 
@@ -346,12 +375,39 @@ export function buildUpdateBundle(
   return { update, activity };
 }
 
+export function buildCommentBundle(input: NewCommentInput) {
+  const now = new Date().toISOString();
+  const targetLabel =
+    input.entityType === 'request' ? 'solicitacao' : 'task';
+
+  const comment: CommentItem = {
+    id: createId('COM'),
+    entityType: input.entityType,
+    entityId: input.entityId,
+    departmentId: input.departmentId,
+    author: input.author,
+    message: input.message,
+    createdAt: now,
+  };
+
+  const activity: ActivityItem = {
+    id: createId('ACT'),
+    kind: 'update',
+    label: `Comentario registrado em ${targetLabel}`,
+    highlight: input.message,
+    createdAt: now,
+  };
+
+  return { comment, activity };
+}
+
 export function createInitialState(): PrototypeState {
   return {
     departments: seededDepartments.map((department) => ({ ...department })),
     requests: cloneRequests(seededRequests),
     tasks: cloneTasks(seededTasks),
     updates: cloneUpdates(seededUpdates),
+    comments: cloneComments(seededComments),
     activities: cloneActivities(seededActivities),
   };
 }

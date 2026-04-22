@@ -14,12 +14,18 @@ import {
   StatusPill,
 } from '@/components/ui';
 import {
+  formatDateTime,
   formatShortDate,
   isCriticalDeadline,
   isOpenRequest,
   relativeSlaText,
 } from '@/lib/formatters';
-import type { NewRequestInput, RequestStatus } from '@/lib/types';
+import type {
+  NewRequestInput,
+  RequestItem,
+  RequestStatus,
+  UpdateRequestInput,
+} from '@/lib/types';
 
 type RequestFilter = RequestStatus | 'Todas';
 
@@ -32,14 +38,76 @@ const initialForm: NewRequestInput = {
   description: '',
 };
 
+const emptyEditForm: UpdateRequestInput = {
+  id: '',
+  title: '',
+  requester: '',
+  departmentId: 'ti',
+  priority: 'Media',
+  dueAt: '2026-04-15T18:00',
+  description: '',
+  owner: '',
+};
+
+function buildEditForm(request?: RequestItem): UpdateRequestInput {
+  if (!request) {
+    return emptyEditForm;
+  }
+
+  return {
+    id: request.id,
+    title: request.title,
+    requester: request.requester,
+    departmentId: request.departmentId,
+    priority: request.priority,
+    dueAt: request.dueAt.slice(0, 16),
+    description: request.description,
+    owner: request.owner,
+  };
+}
+
+function hasDraftChanges(
+  draft: UpdateRequestInput,
+  request?: RequestItem,
+) {
+  if (!request) {
+    return false;
+  }
+
+  return (
+    draft.title !== request.title ||
+    draft.requester !== request.requester ||
+    draft.departmentId !== request.departmentId ||
+    draft.priority !== request.priority ||
+    draft.dueAt !== request.dueAt.slice(0, 16) ||
+    draft.description !== request.description ||
+    draft.owner !== request.owner
+  );
+}
+
 export function RequestsPage() {
-  const { advanceRequest, createRequest, departments, requests, tasks } = usePrototype();
+  const {
+    addComment,
+    advanceRequest,
+    comments,
+    createRequest,
+    departments,
+    requests,
+    tasks,
+    updateRequest,
+  } = usePrototype();
   const [selectedId, setSelectedId] = useState<string>('');
   const [query, setQuery] = useState('');
   const deferredQuery = useDeferredValue(query);
   const [statusFilter, setStatusFilter] = useState<RequestFilter>('Todas');
   const [showComposer, setShowComposer] = useState(false);
+  const [showEditor, setShowEditor] = useState(false);
   const [form, setForm] = useState(initialForm);
+  const [editForm, setEditForm] = useState<UpdateRequestInput>(emptyEditForm);
+  const [requestComment, setRequestComment] = useState({
+    author: '',
+    message: '',
+  });
   const [isPending, startTransition] = useTransition();
 
   const filteredRequests = requests.filter((request) => {
@@ -69,8 +137,28 @@ export function RequestsPage() {
   const selectedRequest =
     filteredRequests.find((request) => request.id === selectedId) ?? filteredRequests[0];
 
+  useEffect(() => {
+    if (!selectedRequest) {
+      return;
+    }
+
+    setEditForm(buildEditForm(selectedRequest));
+    setRequestComment({
+      author: selectedRequest.owner,
+      message: '',
+    });
+    setShowEditor(false);
+  }, [selectedRequest?.id]);
+
   const relatedTasks = selectedRequest
     ? tasks.filter((task) => task.requestId === selectedRequest.id)
+    : [];
+
+  const requestComments = selectedRequest
+    ? comments.filter(
+        (comment) =>
+          comment.entityType === 'request' && comment.entityId === selectedRequest.id,
+      )
     : [];
 
   const selectedDepartment = selectedRequest
@@ -88,12 +176,24 @@ export function RequestsPage() {
   const validationRequests = requests.filter(
     (request) => request.status === 'Validacao',
   ).length;
+  const canSaveDraft = hasDraftChanges(editForm, selectedRequest);
+  const hasCommentMessage = requestComment.message.trim().length > 0;
 
   function updateForm<K extends keyof NewRequestInput>(
     field: K,
     value: NewRequestInput[K],
   ) {
     setForm((current) => ({
+      ...current,
+      [field]: value,
+    }));
+  }
+
+  function updateEditForm<K extends keyof UpdateRequestInput>(
+    field: K,
+    value: UpdateRequestInput[K],
+  ) {
+    setEditForm((current) => ({
       ...current,
       [field]: value,
     }));
@@ -110,13 +210,53 @@ export function RequestsPage() {
     });
   }
 
-  function handleAdvance() {
+  function handleSaveRequest(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
     if (!selectedRequest) {
       return;
     }
 
     startTransition(() => {
-      advanceRequest(selectedRequest.id);
+      updateRequest(editForm);
+      setShowEditor(false);
+    });
+  }
+
+  function handleAddRequestComment() {
+    if (!selectedRequest || !hasCommentMessage) {
+      return;
+    }
+
+    startTransition(() => {
+      addComment({
+        entityType: 'request',
+        entityId: selectedRequest.id,
+        departmentId: selectedRequest.departmentId,
+        author: requestComment.author.trim() || selectedRequest.owner,
+        message: requestComment.message.trim(),
+      });
+      setRequestComment((current) => ({
+        ...current,
+        message: '',
+      }));
+    });
+  }
+
+  function handleAdvanceWithContext() {
+    if (!selectedRequest || !hasCommentMessage) {
+      return;
+    }
+
+    startTransition(() => {
+      advanceRequest(selectedRequest.id, {
+        author: requestComment.author.trim() || selectedRequest.owner,
+        message: requestComment.message.trim(),
+      });
+      setRequestComment((current) => ({
+        ...current,
+        message: '',
+      }));
     });
   }
 
@@ -125,7 +265,7 @@ export function RequestsPage() {
       <SectionHeader
         eyebrow="Gestao centralizada"
         title="Solicitacoes com contexto, prioridade e SLA no mesmo fluxo"
-        description="A tela organiza entrada, acompanhamento e detalhamento sem depender de planilhas paralelas."
+        description="A tela agora permite editar a demanda selecionada e registrar andamento antes de avancar o fluxo."
         action={
           <GhostButton onClick={() => setShowComposer((current) => !current)}>
             {showComposer ? 'Fechar formulario' : 'Nova solicitacao'}
@@ -246,7 +386,7 @@ export function RequestsPage() {
           <SectionHeader
             eyebrow="Fila operacional"
             title="Lista de solicitacoes"
-            description="Pesquise, filtre e selecione uma demanda para analisar detalhes e dependencias."
+            description="Pesquise, filtre e selecione uma demanda para analisar detalhes, editar dados e registrar contexto."
           />
 
           <div className="toolbar">
@@ -318,15 +458,11 @@ export function RequestsPage() {
               <SectionHeader
                 eyebrow={selectedRequest.id}
                 title={selectedRequest.title}
+                description="Os detalhes ficam editaveis e a evolucao do fluxo passa a exigir contexto registrado."
                 action={
-                  <AccentButton
-                    onClick={handleAdvance}
-                    disabled={isPending || selectedRequest.status === 'Concluida'}
-                  >
-                    {selectedRequest.status === 'Concluida'
-                      ? 'Fluxo concluido'
-                      : 'Avancar etapa'}
-                  </AccentButton>
+                  <GhostButton onClick={() => setShowEditor((current) => !current)}>
+                    {showEditor ? 'Fechar edicao' : 'Editar solicitacao'}
+                  </GhostButton>
                 }
               />
 
@@ -370,29 +506,248 @@ export function RequestsPage() {
               ) : null}
             </Panel>
 
+            {showEditor ? (
+              <Panel>
+                <SectionHeader
+                  eyebrow="Edicao direta"
+                  title="Atualizar dados da solicitacao"
+                  description="Ajuste escopo, prazo, prioridade e ownership sem sair da tela."
+                />
+
+                <form className="form-grid" onSubmit={handleSaveRequest}>
+                  <label>
+                    Titulo
+                    <input
+                      value={editForm.title}
+                      onChange={(event) => updateEditForm('title', event.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Solicitante
+                    <input
+                      value={editForm.requester}
+                      onChange={(event) => updateEditForm('requester', event.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Departamento responsavel
+                    <select
+                      value={editForm.departmentId}
+                      onChange={(event) =>
+                        updateEditForm(
+                          'departmentId',
+                          event.target.value as UpdateRequestInput['departmentId'],
+                        )
+                      }
+                    >
+                      {departments.map((department) => (
+                        <option key={department.id} value={department.id}>
+                          {department.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label>
+                    Prioridade
+                    <select
+                      value={editForm.priority}
+                      onChange={(event) =>
+                        updateEditForm(
+                          'priority',
+                          event.target.value as UpdateRequestInput['priority'],
+                        )
+                      }
+                    >
+                      <option value="Baixa">Baixa</option>
+                      <option value="Media">Media</option>
+                      <option value="Alta">Alta</option>
+                      <option value="Critica">Critica</option>
+                    </select>
+                  </label>
+
+                  <label>
+                    Prazo
+                    <input
+                      type="datetime-local"
+                      value={editForm.dueAt}
+                      onChange={(event) => updateEditForm('dueAt', event.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <label>
+                    Responsavel
+                    <input
+                      value={editForm.owner}
+                      onChange={(event) => updateEditForm('owner', event.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <label className="form-grid__full">
+                    Descricao
+                    <textarea
+                      value={editForm.description}
+                      onChange={(event) => updateEditForm('description', event.target.value)}
+                      rows={5}
+                      required
+                    />
+                  </label>
+
+                  <div className="form-grid__actions">
+                    <GhostButton
+                      type="button"
+                      onClick={() => {
+                        setEditForm(buildEditForm(selectedRequest));
+                        setShowEditor(false);
+                      }}
+                    >
+                      Cancelar
+                    </GhostButton>
+                    <AccentButton
+                      disabled={
+                        isPending ||
+                        !editForm.title ||
+                        !editForm.requester ||
+                        !editForm.owner ||
+                        !canSaveDraft
+                      }
+                    >
+                      {isPending ? 'Salvando...' : 'Salvar alteracoes'}
+                    </AccentButton>
+                  </div>
+                </form>
+              </Panel>
+            ) : null}
+
+            <Panel>
+              <SectionHeader
+                eyebrow="Contexto operacional"
+                title="Comentarios e historico da solicitacao"
+                description="Registre o que esta sendo feito antes de avancar ou concluir a demanda."
+              />
+
+              <form
+                className="form-grid"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleAddRequestComment();
+                }}
+              >
+                <label>
+                  Autor do registro
+                  <input
+                    value={requestComment.author}
+                    onChange={(event) =>
+                      setRequestComment((current) => ({
+                        ...current,
+                        author: event.target.value,
+                      }))
+                    }
+                    placeholder="Quem esta atualizando a solicitacao"
+                    required
+                  />
+                </label>
+
+                <label className="form-grid__full">
+                  Comentario de andamento
+                  <textarea
+                    value={requestComment.message}
+                    onChange={(event) =>
+                      setRequestComment((current) => ({
+                        ...current,
+                        message: event.target.value,
+                      }))
+                    }
+                    placeholder="Ex.: Ajuste em execucao, aguardando validacao do financeiro e revisao final do escopo."
+                    rows={4}
+                    required
+                  />
+                </label>
+
+                <div className="form-grid__actions">
+                  <GhostButton disabled={isPending || !hasCommentMessage}>
+                    {isPending ? 'Registrando...' : 'Salvar comentario'}
+                  </GhostButton>
+                  <AccentButton
+                    type="button"
+                    onClick={handleAdvanceWithContext}
+                    disabled={
+                      isPending ||
+                      selectedRequest.status === 'Concluida' ||
+                      !hasCommentMessage
+                    }
+                  >
+                    {selectedRequest.status === 'Concluida'
+                      ? 'Fluxo concluido'
+                      : selectedRequest.status === 'Validacao'
+                        ? 'Registrar e concluir'
+                        : 'Registrar e avancar'}
+                  </AccentButton>
+                </div>
+              </form>
+
+              {requestComments.length > 0 ? (
+                <div className="feed">
+                  {requestComments.map((comment) => (
+                    <article className="feed-item" key={comment.id}>
+                      <div className="feed-item__content">
+                        <div className="feed-item__header">
+                          <strong>{comment.author}</strong>
+                          <span>{formatDateTime(comment.createdAt)}</span>
+                        </div>
+                        <p>{comment.message}</p>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <p className="empty-state">
+                  Ainda nao ha comentarios nesta solicitacao.
+                </p>
+              )}
+            </Panel>
+
             <Panel>
               <div className="detail-stack">
                 <SectionHeader
                   eyebrow="Dependencias"
                   title="Tasks vinculadas"
-                  description="Toda solicitacao gera tarefas relacionadas para garantir execucao rastreavel."
+                  description="Cada task tambem pode registrar contexto proprio no quadro de execucao."
                 />
                 {relatedTasks.length > 0 ? (
                   <div className="feed">
-                    {relatedTasks.map((task) => (
-                      <article className="feed-item" key={task.id}>
-                        <div className="feed-item__content">
-                          <div className="feed-item__header">
-                            <strong>{task.title}</strong>
-                            <StatusPill value={task.status} />
+                    {relatedTasks.map((task) => {
+                      const latestTaskComment = comments.find(
+                        (comment) =>
+                          comment.entityType === 'task' && comment.entityId === task.id,
+                      );
+
+                      return (
+                        <article className="feed-item" key={task.id}>
+                          <div className="feed-item__content">
+                            <div className="feed-item__header">
+                              <strong>{task.title}</strong>
+                              <StatusPill value={task.status} />
+                            </div>
+                            <p>
+                              {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforco{' '}
+                              {task.effort}
+                            </p>
+                            {latestTaskComment ? (
+                              <p>
+                                Ultimo comentario: {latestTaskComment.message}
+                              </p>
+                            ) : null}
                           </div>
-                          <p>
-                            {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforco{' '}
-                            {task.effort}
-                          </p>
-                        </div>
-                      </article>
-                    ))}
+                        </article>
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="empty-state">Nenhuma task vinculada encontrada.</p>

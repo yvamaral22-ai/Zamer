@@ -201,13 +201,15 @@ label {
 
 .brand-block__title {
   margin: 0.65rem 0 0.45rem;
-  max-width: 100%;
-  font-size: clamp(1.6rem, 7.4vw, 2.6rem);
-  line-height: 1;
-  overflow-wrap: break-word;
-  word-break: normal;
+  max-width: none;
+  font-size: clamp(1.4rem, 4vw, 2.55rem);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  overflow-wrap: normal;
+  word-break: keep-all;
   hyphens: none;
-  text-wrap: balance;
+  white-space: nowrap;
+  text-wrap: nowrap;
 }
 
 .brand-block__copy {
@@ -875,6 +877,20 @@ label {
   font-size: 0.92rem;
 }
 
+.task-card__comment-stack,
+.task-card__history {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.task-card__field {
+  min-width: 0;
+}
+
+.task-card__field textarea {
+  min-height: 5.5rem;
+}
+
 .select-inline {
   width: min(100%, 280px);
   min-width: min(220px, 100%);
@@ -943,11 +959,15 @@ label {
   }
 
   .shell__sidebar {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     position: static;
     height: auto;
     overflow: visible;
+  }
+
+  .brand-block {
+    grid-column: 1 / -1;
   }
 
   .brand-block,
@@ -1030,7 +1050,7 @@ label {
   }
 
   .brand-block__title {
-    font-size: clamp(1.5rem, 9vw, 2.15rem);
+    font-size: clamp(1.3rem, 8vw, 1.95rem);
   }
 
   .topbar__title {
