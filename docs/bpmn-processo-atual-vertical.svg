@@ -1,194 +1,198 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1900" viewBox="0 0 1400 1900">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1360" viewBox="0 0 2400 1360" preserveAspectRatio="xMidYMin meet">
   <defs>
     <style>
       .bg { fill: #f4f7fb; }
-      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #17324d; }
-      .subtitle { font: 400 18px 'Segoe UI', Arial, sans-serif; fill: #4d6884; }
-      .pool { fill: #ffffff; stroke: #8fa3b7; stroke-width: 2.2; }
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #18334d; }
+      .subtitle { font: 400 18px 'Segoe UI', Arial, sans-serif; fill: #536d86; }
+      .pool { fill: #ffffff; stroke: #92a6ba; stroke-width: 2.2; }
       .lane-a { fill: #fbfdff; }
-      .lane-b { fill: #f2f7fc; }
-      .divider { stroke: #bfccd8; stroke-width: 1.4; }
-      .lane-title { font: 700 21px 'Segoe UI', Arial, sans-serif; fill: #27445f; text-anchor: middle; }
-      .lane-text { font: 400 15px 'Segoe UI', Arial, sans-serif; fill: #54708a; text-anchor: middle; }
-      .task { fill: #eaf3ff; stroke: #3f6f98; stroke-width: 2.4; rx: 14; ry: 14; }
-      .task-risk { fill: #fff2e8; stroke: #c77749; stroke-width: 2.4; rx: 14; ry: 14; }
-      .task-text { font: 600 18px 'Segoe UI', Arial, sans-serif; fill: #17324d; text-anchor: middle; }
-      .event { fill: #ffffff; stroke: #2c5b84; stroke-width: 3.5; }
-      .end-event { fill: #ffffff; stroke: #1f4260; stroke-width: 5.2; }
-      .event-label { font: 600 15px 'Segoe UI', Arial, sans-serif; fill: #17324d; text-anchor: middle; }
-      .gateway { fill: #ffffff; stroke: #355f87; stroke-width: 2.6; }
-      .gateway-mark { font: 700 22px 'Segoe UI', Arial, sans-serif; fill: #355f87; text-anchor: middle; dominant-baseline: middle; }
-      .flow { fill: none; stroke: #5a7690; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
-      .flow-label { font: 700 14px 'Segoe UI', Arial, sans-serif; fill: #7b5d23; }
-      .note { fill: #fff8df; stroke: #d2b662; stroke-width: 1.8; rx: 12; ry: 12; }
-      .note-title { font: 700 15px 'Segoe UI', Arial, sans-serif; fill: #6c5518; }
-      .note-text { font: 400 14px 'Segoe UI', Arial, sans-serif; fill: #6c5518; }
+      .lane-b { fill: #f1f6fb; }
+      .divider { stroke: #c3cfdb; stroke-width: 1.4; }
+      .lane-title { font: 700 25px 'Segoe UI', Arial, sans-serif; fill: #274560; text-anchor: middle; }
+      .lane-text { font: 400 17px 'Segoe UI', Arial, sans-serif; fill: #5a748d; text-anchor: middle; }
+      .task { fill: #eaf3ff; stroke: #49749c; stroke-width: 2.5; }
+      .task-risk { fill: #fff3ea; stroke: #d17b4d; stroke-width: 2.5; }
+      .task-text { font: 600 22px 'Segoe UI', Arial, sans-serif; fill: #17324d; text-anchor: middle; }
+      .gateway { fill: #ffffff; stroke: #365f87; stroke-width: 2.6; }
+      .gateway-text { font: 700 19px 'Segoe UI', Arial, sans-serif; fill: #365f87; text-anchor: middle; }
+      .event { fill: #ffffff; stroke: #2f5c86; stroke-width: 3.4; }
+      .end-event { fill: #ffffff; stroke: #1f425f; stroke-width: 5.2; }
+      .event-label { font: 600 17px 'Segoe UI', Arial, sans-serif; fill: #17324d; text-anchor: middle; }
+      .flow { fill: none; stroke: #5a7690; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#arrow); }
+      .note { fill: #fff8de; stroke: #d3b765; stroke-width: 1.8; }
+      .note-title { font: 700 16px 'Segoe UI', Arial, sans-serif; fill: #6f5819; }
+      .note-text { font: 400 15px 'Segoe UI', Arial, sans-serif; fill: #6f5819; }
     </style>
     <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
       <path d="M0,0 L12,6 L0,12 z" fill="#5a7690" />
     </marker>
   </defs>
 
-  <rect class="bg" x="0" y="0" width="1400" height="1900" />
-  <text class="title" x="60" y="62">Diagrama BPMN do processo atual (as-is)</text>
-  <text class="subtitle" x="60" y="94">Fluxo atual da gestao de solicitacoes internas antes da digitalizacao</text>
+  <rect class="bg" x="0" y="0" width="2400" height="1360" />
+  <text class="title" x="60" y="64">Diagrama BPMN do processo atual (as-is)</text>
+  <text class="subtitle" x="60" y="96">Fluxo atual da gestao de solicitacoes internas antes da digitalizacao</text>
 
-  <rect class="pool" x="40" y="130" width="1320" height="1520" />
-  <line class="divider" x1="220" y1="130" x2="220" y2="1650" />
-  <line class="divider" x1="40" y1="500" x2="1360" y2="500" />
-  <line class="divider" x1="40" y1="870" x2="1360" y2="870" />
-  <line class="divider" x1="40" y1="1240" x2="1360" y2="1240" />
+  <rect class="pool" x="40" y="140" width="2320" height="1180" />
+  <line class="divider" x1="260" y1="140" x2="260" y2="1320" />
+  <line class="divider" x1="40" y1="400" x2="2360" y2="400" />
+  <line class="divider" x1="40" y1="720" x2="2360" y2="720" />
+  <line class="divider" x1="40" y1="1020" x2="2360" y2="1020" />
 
-  <rect class="lane-a" x="40" y="130" width="1320" height="370" />
-  <rect class="lane-b" x="40" y="500" width="1320" height="370" />
-  <rect class="lane-a" x="40" y="870" width="1320" height="370" />
-  <rect class="lane-b" x="40" y="1240" width="1320" height="410" />
+  <rect class="lane-a" x="40" y="140" width="2320" height="260" />
+  <rect class="lane-b" x="40" y="400" width="2320" height="320" />
+  <rect class="lane-a" x="40" y="720" width="2320" height="300" />
+  <rect class="lane-b" x="40" y="1020" width="2320" height="300" />
 
-  <text class="lane-title" x="130" y="195">Colaborador</text>
-  <text class="lane-title" x="130" y="223">solicitante</text>
-  <text class="lane-text" x="130" y="258">Abre a demanda</text>
-  <text class="lane-text" x="130" y="280">e envia dados</text>
+  <text class="lane-title" x="150" y="225">Colaborador</text>
+  <text class="lane-title" x="150" y="255">solicitante</text>
+  <text class="lane-text" x="150" y="300">Abre a solicitacao</text>
+  <text class="lane-text" x="150" y="324">e complementa dados</text>
 
-  <text class="lane-title" x="130" y="565">Lider / area</text>
-  <text class="lane-title" x="130" y="593">receptora</text>
-  <text class="lane-text" x="130" y="628">Recebe, analisa</text>
-  <text class="lane-text" x="130" y="650">e prioriza</text>
+  <text class="lane-title" x="150" y="535">Lider / area</text>
+  <text class="lane-title" x="150" y="565">receptora</text>
+  <text class="lane-text" x="150" y="610">Recebe, analisa</text>
+  <text class="lane-text" x="150" y="634">e direciona</text>
 
-  <text class="lane-title" x="130" y="935">Equipe</text>
-  <text class="lane-title" x="130" y="963">responsavel</text>
-  <text class="lane-text" x="130" y="998">Registra, executa</text>
-  <text class="lane-text" x="130" y="1020">e cobra retornos</text>
+  <text class="lane-title" x="150" y="845">Equipe</text>
+  <text class="lane-title" x="150" y="875">responsavel</text>
+  <text class="lane-text" x="150" y="920">Registra, executa</text>
+  <text class="lane-text" x="150" y="944">e acompanha</text>
 
-  <text class="lane-title" x="130" y="1305">Validacao</text>
-  <text class="lane-title" x="130" y="1333">e encerramento</text>
-  <text class="lane-text" x="130" y="1368">Confere entrega</text>
-  <text class="lane-text" x="130" y="1390">e encerra</text>
+  <text class="lane-title" x="150" y="1145">Validacao</text>
+  <text class="lane-title" x="150" y="1175">e encerramento</text>
+  <text class="lane-text" x="150" y="1220">Confere a entrega</text>
+  <text class="lane-text" x="150" y="1244">e encerra</text>
 
-  <circle class="event" cx="650" cy="210" r="30" />
-  <text class="event-label" x="650" y="260">Inicio</text>
+  <circle class="event" cx="360" cy="262" r="30" />
+  <text class="event-label" x="360" y="312">Inicio</text>
 
-  <rect class="task" x="500" y="290" width="300" height="90" />
-  <text class="task-text" x="650" y="325">
-    <tspan x="650" dy="0">Enviar solicitacao</tspan>
-    <tspan x="650" dy="24">por email, chat</tspan>
-    <tspan x="650" dy="24">ou conversa</tspan>
+  <rect class="task" x="440" y="220" width="300" height="84" rx="18" ry="18" />
+  <text class="task-text" x="590" y="255">
+    <tspan x="590" dy="0">Enviar solicitacao</tspan>
+    <tspan x="590" dy="22">por email, chat</tspan>
+    <tspan x="590" dy="22">ou conversa</tspan>
   </text>
 
-  <rect class="task-risk" x="930" y="270" width="300" height="90" />
-  <text class="task-text" x="1080" y="305">
-    <tspan x="1080" dy="0">Complementar</tspan>
-    <tspan x="1080" dy="24">informacoes</tspan>
-    <tspan x="1080" dy="24">e reenviar</tspan>
+  <rect class="task" x="760" y="510" width="300" height="84" rx="18" ry="18" />
+  <text class="task-text" x="910" y="557">
+    <tspan x="910" dy="0">Receber e analisar</tspan>
+    <tspan x="910" dy="22">a demanda</tspan>
   </text>
 
-  <rect class="task" x="500" y="575" width="300" height="90" />
-  <text class="task-text" x="650" y="622">
-    <tspan x="650" dy="0">Receber e analisar</tspan>
-    <tspan x="650" dy="24">a demanda</tspan>
+  <polygon class="gateway" points="1100,504 1148,552 1100,600 1052,552" />
+  <text class="gateway-text" x="1100" y="546">
+    <tspan x="1100" dy="0">Dados</tspan>
+    <tspan x="1100" dy="20">ok?</tspan>
   </text>
 
-  <polygon class="gateway" points="650,720 690,760 650,800 610,760" />
-  <text class="gateway-mark" x="650" y="760">?</text>
-
-  <rect class="task-risk" x="930" y="715" width="300" height="90" />
-  <text class="task-text" x="1080" y="750">
-    <tspan x="1080" dy="0">Solicitar mais</tspan>
-    <tspan x="1080" dy="24">detalhes</tspan>
+  <rect class="task" x="1240" y="440" width="250" height="72" rx="18" ry="18" />
+  <text class="task-text" x="1365" y="482">
+    <tspan x="1365" dy="0">Definir prioridade</tspan>
   </text>
 
-  <rect class="task" x="500" y="810" width="300" height="90" />
-  <text class="task-text" x="650" y="845">
-    <tspan x="650" dy="0">Definir prioridade</tspan>
-    <tspan x="650" dy="24">e responsavel</tspan>
+  <rect class="task" x="1540" y="440" width="290" height="72" rx="18" ry="18" />
+  <text class="task-text" x="1685" y="482">
+    <tspan x="1685" dy="0">Selecionar responsavel</tspan>
   </text>
 
-  <rect class="task-risk" x="500" y="955" width="300" height="90" />
-  <text class="task-text" x="650" y="990">
-    <tspan x="650" dy="0">Registrar controle</tspan>
-    <tspan x="650" dy="24">em planilha ou chat</tspan>
+  <rect class="task-risk" x="1240" y="510" width="300" height="84" rx="18" ry="18" />
+  <text class="task-text" x="1390" y="557">
+    <tspan x="1390" dy="0">Solicitar mais</tspan>
+    <tspan x="1390" dy="22">detalhes</tspan>
   </text>
 
-  <rect class="task" x="500" y="1090" width="300" height="90" />
-  <text class="task-text" x="650" y="1138">
-    <tspan x="650" dy="0">Executar tarefa</tspan>
+  <rect class="task-risk" x="1610" y="220" width="320" height="84" rx="18" ry="18" />
+  <text class="task-text" x="1770" y="255">
+    <tspan x="1770" dy="0">Complementar dados</tspan>
+    <tspan x="1770" dy="22">e reenviar</tspan>
   </text>
 
-  <polygon class="gateway" points="650,1265 690,1305 650,1345 610,1305" />
-  <text class="gateway-mark" x="650" y="1305">?</text>
-
-  <rect class="task-risk" x="930" y="1245" width="300" height="90" />
-  <text class="task-text" x="1080" y="1280">
-    <tspan x="1080" dy="0">Acionar outra area</tspan>
-    <tspan x="1080" dy="24">e aguardar retorno</tspan>
+  <rect class="task-risk" x="1540" y="790" width="290" height="82" rx="18" ry="18" />
+  <text class="task-text" x="1685" y="826">
+    <tspan x="1685" dy="0">Registrar em</tspan>
+    <tspan x="1685" dy="22">planilha ou chat</tspan>
   </text>
 
-  <rect class="task-risk" x="930" y="1380" width="300" height="90" />
-  <text class="task-text" x="1080" y="1415">
-    <tspan x="1080" dy="0">Solicitar ajuste</tspan>
-    <tspan x="1080" dy="24">e reenviar para execucao</tspan>
+  <rect class="task" x="1880" y="790" width="240" height="82" rx="18" ry="18" />
+  <text class="task-text" x="2000" y="837">
+    <tspan x="2000" dy="0">Executar tarefa</tspan>
   </text>
 
-  <rect class="task-risk" x="500" y="1380" width="300" height="90" />
-  <text class="task-text" x="650" y="1415">
-    <tspan x="650" dy="0">Atualizar status</tspan>
-    <tspan x="650" dy="24">manualmente</tspan>
+  <polygon class="gateway" points="2140,786 2186,832 2140,878 2094,832" />
+  <text class="gateway-text" x="2140" y="826">
+    <tspan x="2140" dy="0">Outra</tspan>
+    <tspan x="2140" dy="20">area?</tspan>
   </text>
 
-  <rect class="task" x="500" y="1495" width="300" height="90" />
-  <text class="task-text" x="650" y="1530">
-    <tspan x="650" dy="0">Validar entrega</tspan>
-    <tspan x="650" dy="24">com o solicitante</tspan>
+  <rect class="task-risk" x="1510" y="900" width="340" height="76" rx="18" ry="18" />
+  <text class="task-text" x="1680" y="944">
+    <tspan x="1680" dy="0">Acionar outra area</tspan>
+    <tspan x="1680" dy="22">e aguardar retorno</tspan>
   </text>
 
-  <polygon class="gateway" points="650,1625 690,1665 650,1705 610,1665" />
-  <text class="gateway-mark" x="650" y="1665">?</text>
+  <rect class="task-risk" x="1880" y="900" width="280" height="76" rx="18" ry="18" />
+  <text class="task-text" x="2020" y="944">
+    <tspan x="2020" dy="0">Atualizar status</tspan>
+    <tspan x="2020" dy="22">manualmente</tspan>
+  </text>
 
-  <circle class="end-event" cx="650" cy="1775" r="30" />
-  <text class="event-label" x="650" y="1825">Fim</text>
+  <rect class="task" x="1760" y="1100" width="300" height="82" rx="18" ry="18" />
+  <text class="task-text" x="1910" y="1147">
+    <tspan x="1910" dy="0">Validar entrega</tspan>
+    <tspan x="1910" dy="22">com o solicitante</tspan>
+  </text>
 
-  <polyline class="flow" points="650,240 650,290" />
-  <polyline class="flow" points="650,380 650,575" />
-  <polyline class="flow" points="650,665 650,720" />
-  <polyline class="flow" points="650,800 650,810" />
-  <text class="flow-label" x="665" y="792">Sim</text>
+  <polygon class="gateway" points="2140,1096 2186,1142 2140,1188 2094,1142" />
+  <text class="gateway-text" x="2140" y="1136">
+    <tspan x="2140" dy="0">Aprovada?</tspan>
+  </text>
 
-  <polyline class="flow" points="690,760 760,760 760,760 930,760" />
-  <text class="flow-label" x="790" y="748">Nao</text>
+  <rect class="task-risk" x="1460" y="1100" width="330" height="82" rx="18" ry="18" />
+  <text class="task-text" x="1625" y="1147">
+    <tspan x="1625" dy="0">Solicitar ajuste</tspan>
+    <tspan x="1625" dy="22">e reenviar</tspan>
+  </text>
 
-  <polyline class="flow" points="1080,715 1080,360 930,360" />
-  <polyline class="flow" points="930,315 800,315" />
-  <polyline class="flow" points="930,315 820,315" />
-  <polyline class="flow" points="930,315 820,315 820,620 800,620" />
+  <circle class="end-event" cx="2240" cy="1142" r="30" />
+  <text class="event-label" x="2240" y="1192">Fim</text>
 
-  <polyline class="flow" points="650,900 650,955" />
-  <polyline class="flow" points="650,1045 650,1090" />
-  <polyline class="flow" points="650,1180 650,1265" />
+  <polyline class="flow" points="390,262 440,262" />
+  <polyline class="flow" points="590,304 590,552 760,552" />
+  <polyline class="flow" points="1060,552 1052,552" />
 
-  <polyline class="flow" points="690,1305 930,1305" />
-  <text class="flow-label" x="785" y="1292">Sim</text>
+  <polyline class="flow" points="1100,504 1100,476 1240,476" />
+  <polyline class="flow" points="1148,552 1240,552" />
 
-  <polyline class="flow" points="1080,1335 1080,1135 800,1135" />
-  <polyline class="flow" points="610,1305 650,1305 650,1380" />
-  <text class="flow-label" x="565" y="1292">Nao</text>
+  <polyline class="flow" points="1490,476 1540,476" />
+  <polyline class="flow" points="1685,512 1685,790" />
 
-  <polyline class="flow" points="650,1470 650,1495" />
-  <polyline class="flow" points="650,1585 650,1625" />
+  <polyline class="flow" points="1540,552 1660,552 1660,304" />
+  <polyline class="flow" points="1610,262 1400,262 1400,468 1060,468 1060,552 1052,552" />
 
-  <polyline class="flow" points="690,1665 810,1665 810,1775 620,1775" />
-  <text class="flow-label" x="720" y="1652">Sim</text>
+  <polyline class="flow" points="1830,831 1880,831" />
+  <polyline class="flow" points="2120,831 2094,832" />
 
-  <polyline class="flow" points="650,1705 650,1715 1080,1715 1080,1470" />
-  <text class="flow-label" x="875" y="1702">Nao</text>
+  <polyline class="flow" points="2140,878 2140,938 1850,938" />
+  <polyline class="flow" points="1680,900 1680,760 1880,760 1880,831" />
 
-  <polyline class="flow" points="930,1425 880,1425 880,1135 800,1135" />
+  <polyline class="flow" points="2140,878 2140,938 2020,938 2020,900" />
 
-  <rect class="note" x="910" y="1530" width="330" height="180" />
-  <text class="note-title" x="930" y="1560">Gargalos evidenciados no as-is</text>
-  <text class="note-text" x="930" y="1590">
-    <tspan x="930" dy="0">1. Entrada da demanda sem padrao unico</tspan>
-    <tspan x="930" dy="24">2. Triagem e priorizacao manuais</tspan>
-    <tspan x="930" dy="24">3. Controle em planilhas e mensagens</tspan>
-    <tspan x="930" dy="24">4. Dependencia de retorno informal</tspan>
-    <tspan x="930" dy="24">5. Atualizacao manual do status</tspan>
+  <polyline class="flow" points="2020,976 2020,1100" />
+  <polyline class="flow" points="2060,1141 2094,1142" />
+  <polyline class="flow" points="2186,1142 2210,1142" />
+
+  <polyline class="flow" points="2094,1142 1790,1142" />
+
+  <polyline class="flow" points="1625,1100 1625,730 2000,730 2000,790" />
+
+  <rect class="note" x="1970" y="190" width="300" height="138" rx="14" ry="14" />
+  <text class="note-title" x="1992" y="220">Referencias do processo atual</text>
+  <text class="note-text" x="1992" y="248">
+    <tspan x="1992" dy="0">1. Entrada por canais distintos</tspan>
+    <tspan x="1992" dy="22">2. Triagem e prioridade manuais</tspan>
+    <tspan x="1992" dy="22">3. Controle em planilha e chat</tspan>
+    <tspan x="1992" dy="22">4. Dependencia de retorno informal</tspan>
+    <tspan x="1992" dy="22">5. Encerramento com ajuste manual</tspan>
   </text>
 </svg>

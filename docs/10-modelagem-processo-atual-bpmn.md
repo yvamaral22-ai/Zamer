@@ -2,14 +2,14 @@
 
 Arquivos do diagrama para upload:
 
-- `docs/bpmn-processo-atual.svg`
-- `docs/bpmn-processo-atual.png`
-- `docs/bpmn-processo-atual-final-2.png` - versao mais limpa e recomendada para envio
-- `docs/bpmn-processo-atual-legivel.png` - versao vertical e mais legivel para o site
+- `docs/bpmn-processo-atual.svg` - arquivo fonte limpo e reorganizado
+- `docs/bpmn-processo-atual.png` - versao principal para documentacao
+- `docs/bpmn-processo-atual-final-2.png` - exportacao pronta para envio
+- `docs/bpmn-processo-atual-legivel.png` - exportacao limpa para o site
 
 Preview do diagrama:
 
-![Diagrama BPMN do processo atual](./bpmn-processo-atual.png)
+![Diagrama BPMN do processo atual](./bpmn-processo-atual.svg)
 
 ## Visao da etapa
 
