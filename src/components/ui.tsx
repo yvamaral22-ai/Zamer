@@ -72,13 +72,15 @@ export function MetricCard({
   label,
   value,
   note,
+  className,
 }: {
   label: string;
   value: string;
   note: string;
+  className?: string;
 }) {
   return (
-    <div className="metric-card">
+    <div className={joinClasses('metric-card', className)}>
       <span className="metric-card__label">{label}</span>
       <strong className="metric-card__value">{value}</strong>
       <span className="metric-card__note">{note}</span>

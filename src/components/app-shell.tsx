@@ -7,45 +7,66 @@ import type { ReactNode } from 'react';
 import { usePrototype } from '@/components/prototype-provider';
 import { isOpenRequest } from '@/lib/formatters';
 
-const navigationItems = [
+const navigationGroups = [
   {
-    href: '/',
-    label: 'Painel',
-    description: 'Resumo da operação',
+    label: 'Visao geral',
+    items: [
+      {
+        href: '/',
+        label: 'Dashboard',
+        description: 'Resumo da operacao',
+      },
+      {
+        href: '/solicitacoes',
+        label: 'Solicitacoes',
+        description: 'Fila e atendimento',
+      },
+    ],
   },
   {
-    href: '/solicitacoes',
-    label: 'Solicitações',
-    description: 'Entrada e rastreabilidade',
-  },
-  {
-    href: '/tarefas',
-    label: 'Tarefas',
-    description: 'Execução por etapa',
-  },
-  {
-    href: '/departamentos',
-    label: 'Departamentos',
-    description: 'Transições e comunicação',
+    label: 'Operacao',
+    items: [
+      {
+        href: '/tarefas',
+        label: 'Tarefas',
+        description: 'Kanban por etapa',
+      },
+      {
+        href: '/departamentos',
+        label: 'Departamentos',
+        description: 'Mural entre areas',
+      },
+    ],
   },
 ];
 
-const pageContent: Record<string, { title: string; summary: string }> = {
+const pageContent: Record<
+  string,
+  { eyebrow: string; title: string; summary: string; breadcrumb: string }
+> = {
   '/': {
-    title: 'Painel integrado da operação',
-    summary: 'Fluxos, gargalos e histórico operacional em um único ambiente.',
+    eyebrow: 'Visao executiva',
+    title: 'Painel integrado da operacao',
+    summary: 'Indicadores, gargalos e historico reunidos em um layout mais compacto.',
+    breadcrumb: 'Dashboard',
   },
   '/solicitacoes': {
-    title: 'Central de solicitações internas',
-    summary: 'Cadastre, acompanhe e evolua demandas com status e SLA visíveis.',
+    eyebrow: 'Atendimento interno',
+    title: 'Central de solicitacoes',
+    summary: 'Pesquisa, filtros e acompanhamento da fila no mesmo fluxo visual.',
+    breadcrumb: 'Solicitacoes',
   },
   '/tarefas': {
-    title: 'Quadro de execução',
-    summary: 'Acompanhe a entrega entre áreas, com foco em bloqueios e próximos passos.',
+    eyebrow: 'Execucao',
+    title: 'Quadro operacional',
+    summary: 'Tarefas distribuidas por etapa com foco em contexto e movimentacao.',
+    breadcrumb: 'Tarefas',
   },
   '/departamentos': {
-    title: 'Mural interdepartamental',
-    summary: 'Compartilhe alinhamentos, transições e combinados operacionais.',
+    eyebrow: 'Comunicacao',
+    title: 'Painel de departamentos',
+    summary: 'Capacidade, bloqueios e alinhamentos compartilhados entre areas.',
+    breadcrumb: 'Departamentos',
   },
 };
 
@@ -63,68 +84,90 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="shell">
       <aside className="shell__sidebar">
-        <div className="brand-block">
-          <span className="brand-block__eyebrow">Projeto acadêmico</span>
-          <h1 className="brand-block__title">IntegraFlow</h1>
+        <div className="brand-block brand-block--system">
+          <span className="brand-block__eyebrow">Zamer</span>
+          <h1 className="brand-block__title">Central Operacional</h1>
           <p className="brand-block__copy">
-            Sistema corporativo para consolidar solicitações, tarefas e comunicação
-            operacional.
+            Casca visual mais proxima de um painel corporativo, sem alterar a logica
+            do prototipo.
           </p>
         </div>
 
-        <div className="sidebar-section">
-          <p className="sidebar-label">Navegação</p>
-          <nav className="navigation">
-            {navigationItems.map((item) => {
-              const active = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={
-                    active ? 'navigation__item navigation__item--active' : 'navigation__item'
-                  }
-                >
-                  <strong>{item.label}</strong>
-                  <span>{item.description}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div className="sidebar-section">
-          <p className="sidebar-label">Pulso da operação</p>
-          <div className="sidebar-stack">
-            <div className="sidebar-tile">
-              <span>Solicitações abertas</span>
-              <strong>{openRequests}</strong>
-            </div>
-            <div className="sidebar-tile">
-              <span>Tarefas bloqueadas</span>
-              <strong>{blockedTasks}</strong>
-            </div>
-            <div className="sidebar-tile">
-              <span>Áreas engajadas</span>
-              <strong>{engagedDepartments}</strong>
-            </div>
+        <div className="sidebar-summary">
+          <div className="sidebar-summary__item">
+            <span>Solicitacoes abertas</span>
+            <strong>{openRequests}</strong>
+          </div>
+          <div className="sidebar-summary__item">
+            <span>Tarefas bloqueadas</span>
+            <strong>{blockedTasks}</strong>
+          </div>
+          <div className="sidebar-summary__item">
+            <span>Areas ativas</span>
+            <strong>{engagedDepartments}</strong>
           </div>
         </div>
+
+        {navigationGroups.map((group) => (
+          <div className="sidebar-section" key={group.label}>
+            <p className="sidebar-label">{group.label}</p>
+            <nav className="navigation">
+              {group.items.map((item) => {
+                const active = pathname === item.href;
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={
+                      active ? 'navigation__item navigation__item--active' : 'navigation__item'
+                    }
+                  >
+                    <strong>{item.label}</strong>
+                    <span>{item.description}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        ))}
       </aside>
 
       <div className="shell__canvas">
         <div className="shell__content">
-          <header className="topbar">
+          <div className="shell__utilitybar">
+            <div className="shell__breadcrumbs">
+              <Link href="/">Home</Link>
+              <span>/</span>
+              <span>{currentPage.breadcrumb}</span>
+            </div>
+
+            <div className="shell__utility-actions">
+              <Link href="/solicitacoes" className="utility-button utility-button--accent">
+                + Adicionar
+              </Link>
+              <Link href="/solicitacoes" className="utility-button">
+                Pesquisar
+              </Link>
+              <Link href="/tarefas" className="utility-button">
+                Kanban
+              </Link>
+            </div>
+          </div>
+
+          <header className="topbar topbar--compact">
             <div className="topbar__main">
-              <p className="eyebrow">Sprint 01 | Concepção e protótipo</p>
+              <p className="eyebrow">{currentPage.eyebrow}</p>
               <h2 className="topbar__title">{currentPage.title}</h2>
               <p className="topbar__summary">{currentPage.summary}</p>
             </div>
 
             <div className="topbar__meta">
-              <span>Stakeholders em foco</span>
-              <strong>Diretoria, TI, RH, Financeiro e Operações</strong>
+              <span>Pulso operacional</span>
+              <strong>
+                {openRequests} abertas | {blockedTasks} bloqueios | {engagedDepartments}{' '}
+                areas envolvidas
+              </strong>
             </div>
           </header>
 

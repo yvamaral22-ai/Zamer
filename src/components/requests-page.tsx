@@ -66,10 +66,7 @@ function buildEditForm(request?: RequestItem): UpdateRequestInput {
   };
 }
 
-function hasDraftChanges(
-  draft: UpdateRequestInput,
-  request?: RequestItem,
-) {
+function hasDraftChanges(draft: UpdateRequestInput, request?: RequestItem) {
   if (!request) {
     return false;
   }
@@ -109,6 +106,14 @@ export function RequestsPage() {
     message: '',
   });
   const [isPending, startTransition] = useTransition();
+
+  const departmentsById = new Map(
+    departments.map((department) => [department.id, department]),
+  );
+  const taskCountByRequestId = tasks.reduce((map, task) => {
+    map.set(task.requestId, (map.get(task.requestId) ?? 0) + 1);
+    return map;
+  }, new Map<string, number>());
 
   const filteredRequests = requests.filter((request) => {
     const matchesStatus = statusFilter === 'Todas' || request.status === statusFilter;
@@ -162,10 +167,20 @@ export function RequestsPage() {
     : [];
 
   const selectedDepartment = selectedRequest
-    ? departments.find((department) => department.id === selectedRequest.departmentId)
+    ? departmentsById.get(selectedRequest.departmentId)
     : undefined;
 
+  const totalRequests = requests.length;
   const openRequests = requests.filter((request) => isOpenRequest(request.status)).length;
+  const newRequests = requests.filter((request) => request.status === 'Nova').length;
+  const triageRequests = requests.filter((request) => request.status === 'Triagem').length;
+  const executionRequests = requests.filter((request) => request.status === 'Execução').length;
+  const validationRequests = requests.filter(
+    (request) => request.status === 'Validação',
+  ).length;
+  const completedRequests = requests.filter(
+    (request) => request.status === 'Concluída',
+  ).length;
   const urgentRequests = requests.filter(
     (request) =>
       isOpenRequest(request.status) &&
@@ -173,16 +188,10 @@ export function RequestsPage() {
         request.priority === 'Crítica' ||
         isCriticalDeadline(request.dueAt)),
   ).length;
-  const validationRequests = requests.filter(
-    (request) => request.status === 'Validação',
-  ).length;
   const canSaveDraft = hasDraftChanges(editForm, selectedRequest);
   const hasCommentMessage = requestComment.message.trim().length > 0;
 
-  function updateForm<K extends keyof NewRequestInput>(
-    field: K,
-    value: NewRequestInput[K],
-  ) {
+  function updateForm<K extends keyof NewRequestInput>(field: K, value: NewRequestInput[K]) {
     setForm((current) => ({
       ...current,
       [field]: value,
@@ -262,44 +271,100 @@ export function RequestsPage() {
 
   return (
     <div className="workspace reveal">
-      <SectionHeader
-        eyebrow="Gestão centralizada"
-        title="Solicitações com contexto, prioridade e SLA no mesmo fluxo"
-        description="A tela agora permite editar a demanda selecionada e registrar andamento antes de avançar o fluxo."
-        action={
-          <GhostButton onClick={() => setShowComposer((current) => !current)}>
-            {showComposer ? 'Fechar formulário' : 'Nova solicitação'}
-          </GhostButton>
-        }
-      />
-
-      <div className="metric-grid">
+      <div className="summary-strip">
         <MetricCard
+          className="metric-card--flat metric-card--gold"
+          label="Total de solicitações"
+          value={String(totalRequests)}
+          note="Visão consolidada da fila"
+        />
+        <MetricCard
+          className="metric-card--flat metric-card--green"
           label="Solicitações abertas"
           value={String(openRequests)}
-          note="Demandas ainda em andamento no fluxo"
+          note="Demandas ainda em andamento"
         />
         <MetricCard
+          className="metric-card--flat metric-card--rose"
+          label="Em triagem"
+          value={String(triageRequests)}
+          note="Itens aguardando direcionamento"
+        />
+        <MetricCard
+          className="metric-card--flat metric-card--red"
+          label="Em execução"
+          value={String(executionRequests)}
+          note="Demandas com atendimento ativo"
+        />
+        <MetricCard
+          className="metric-card--flat metric-card--orange"
           label="Fila prioritária"
           value={String(urgentRequests)}
-          note="Itens de alta criticidade ou prazo curto"
+          note="Alta prioridade ou prazo curto"
         />
         <MetricCard
+          className="metric-card--flat metric-card--blue"
           label="Em validação"
           value={String(validationRequests)}
-          note="Demandas aguardando aceite final"
+          note="Aguardando aceite final"
+        />
+        <MetricCard
+          className="metric-card--flat metric-card--stone"
+          label="Concluídas"
+          value={String(completedRequests)}
+          note="Fluxos encerrados"
         />
       </div>
 
-      {showComposer ? (
-        <Panel>
-          <SectionHeader
-            eyebrow="Entrada do fluxo"
-            title="Registrar nova solicitação"
-            description="Ao cadastrar a demanda, o sistema já cria a primeira tarefa da área responsável."
-          />
+      <Panel className="control-panel">
+        <SectionHeader
+          eyebrow="Central de solicitações"
+          title="Filtro e distribuição da fila"
+          description="A leitura ficou mais compacta e tabular, mantendo criação, edição, comentários e avanço no mesmo fluxo."
+          action={
+            <div className="toolbar__actions">
+              <GhostButton type="button" onClick={() => setShowComposer((current) => !current)}>
+                {showComposer ? 'Fechar cadastro' : 'Nova solicitação'}
+              </GhostButton>
+              {selectedRequest ? (
+                <GhostButton type="button" onClick={() => setShowEditor((current) => !current)}>
+                  {showEditor ? 'Fechar edição' : 'Editar selecionada'}
+                </GhostButton>
+              ) : null}
+            </div>
+          }
+        />
 
-          <form className="form-grid" onSubmit={handleSubmit}>
+        <div className="toolbar toolbar--requests">
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Buscar por título, solicitante ou código"
+          />
+          <select
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value as RequestFilter)}
+          >
+            <option value="Todas">Todas</option>
+            <option value="Nova">Nova</option>
+            <option value="Triagem">Triagem</option>
+            <option value="Execução">Execução</option>
+            <option value="Validação">Validação</option>
+            <option value="Concluída">Concluída</option>
+          </select>
+          <AccentButton type="button" onClick={() => setShowComposer((current) => !current)}>
+            {showComposer ? 'Ocultar formulário' : 'Adicionar'}
+          </AccentButton>
+        </div>
+
+        <div className="list-summary">
+          <span>{filteredRequests.length} resultados exibidos</span>
+          <span>{newRequests} itens ainda estão como novos na fila</span>
+          <span>Selecione uma linha para abrir o contexto completo</span>
+        </div>
+
+        {showComposer ? (
+          <form className="form-grid form-grid--compact" onSubmit={handleSubmit}>
             <label>
               Título
               <input
@@ -378,47 +443,28 @@ export function RequestsPage() {
               </AccentButton>
             </div>
           </form>
-        </Panel>
-      ) : null}
+        ) : null}
+      </Panel>
 
-      <div className="section-grid section-grid--wide">
-        <Panel>
-          <SectionHeader
-            eyebrow="Fila operacional"
-            title="Lista de solicitações"
-            description="Pesquise, filtre e selecione uma demanda para analisar detalhes, editar dados e registrar contexto."
-          />
-
-          <div className="toolbar">
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por título, solicitante ou código"
-            />
-            <select
-              value={statusFilter}
-              onChange={(event) => setStatusFilter(event.target.value as RequestFilter)}
-            >
-              <option value="Todas">Todas</option>
-              <option value="Nova">Nova</option>
-              <option value="Triagem">Triagem</option>
-              <option value="Execução">Execução</option>
-              <option value="Validação">Validação</option>
-              <option value="Concluída">Concluída</option>
-            </select>
-          </div>
-
-          <div className="list-summary">
-            <span>{filteredRequests.length} resultados exibidos</span>
-            <span>Selecione uma solicitação para abrir o contexto completo</span>
+      <Panel className="request-table-panel">
+        <div className="request-table-wrapper">
+          <div className="request-table__head">
+            <span>ID</span>
+            <span>Título</span>
+            <span>Departamento</span>
+            <span>Status</span>
+            <span>Abertura</span>
+            <span>Prazo</span>
+            <span>Prioridade</span>
+            <span>Responsável</span>
+            <span>Tarefas</span>
           </div>
 
           {filteredRequests.length > 0 ? (
-            <div className="request-list">
+            <div className="request-table">
               {filteredRequests.map((request) => {
-                const department = departments.find(
-                  (departmentItem) => departmentItem.id === request.departmentId,
-                );
+                const department = departmentsById.get(request.departmentId);
+                const relatedTaskCount = taskCountByRequestId.get(request.id) ?? 0;
 
                 return (
                   <button
@@ -427,342 +473,355 @@ export function RequestsPage() {
                     onClick={() => setSelectedId(request.id)}
                     className={
                       request.id === selectedRequest?.id
-                        ? 'request-row request-row--active'
-                        : 'request-row'
+                        ? 'request-table__row request-table__row--active'
+                        : 'request-table__row'
                     }
                   >
-                    <div className="request-row__main">
-                      <div className="request-row__header">
-                        <strong>{request.title}</strong>
-                        <PriorityPill value={request.priority} />
-                      </div>
-                      <p>{request.requester}</p>
-                      <div className="meta-row">
-                        {department ? <DepartmentPill department={department} /> : null}
-                        <StatusPill value={request.status} />
-                        <span>{relativeSlaText(request.dueAt)}</span>
-                      </div>
-                    </div>
+                    <span className="request-table__cell request-table__cell--mono">
+                      {request.id}
+                    </span>
+                    <span className="request-table__cell request-table__cell--main">
+                      <strong>{request.title}</strong>
+                      <small>{request.requester}</small>
+                    </span>
+                    <span className="request-table__cell">
+                      {department ? <DepartmentPill department={department} /> : '-'}
+                    </span>
+                    <span className="request-table__cell">
+                      <StatusPill value={request.status} />
+                    </span>
+                    <span className="request-table__cell request-table__cell--muted">
+                      {formatShortDate(request.openedAt)}
+                    </span>
+                    <span className="request-table__cell request-table__cell--muted">
+                      {formatShortDate(request.dueAt)}
+                    </span>
+                    <span className="request-table__cell">
+                      <PriorityPill value={request.priority} />
+                    </span>
+                    <span className="request-table__cell request-table__cell--stack">
+                      <strong>{request.owner}</strong>
+                      <small>{relativeSlaText(request.dueAt)}</small>
+                    </span>
+                    <span className="request-table__cell request-table__cell--count">
+                      {relatedTaskCount}
+                    </span>
                   </button>
                 );
               })}
             </div>
           ) : (
-            <p className="empty-state">Nenhuma solicitação encontrada com os filtros atuais.</p>
+            <p className="empty-state request-table__empty">
+              Nenhuma solicitação encontrada com os filtros atuais.
+            </p>
           )}
-        </Panel>
+        </div>
+      </Panel>
 
-        {selectedRequest ? (
-          <div className="stack-layout">
-            <Panel>
-              <SectionHeader
-                eyebrow={selectedRequest.id}
-                title={selectedRequest.title}
-                description="Os detalhes ficam editáveis, e a evolução do fluxo passa a exigir contexto registrado."
-                action={
-                  <GhostButton onClick={() => setShowEditor((current) => !current)}>
-                    {showEditor ? 'Fechar edição' : 'Editar solicitação'}
-                  </GhostButton>
-                }
-              />
+      {selectedRequest ? (
+        <div className="request-detail-layout">
+          <Panel>
+            <SectionHeader
+              eyebrow={selectedRequest.id}
+              title={selectedRequest.title}
+              description="Os dados da solicitação seguem editáveis, agora com uma leitura mais próxima de fila corporativa."
+              action={
+                <GhostButton type="button" onClick={() => setShowEditor((current) => !current)}>
+                  {showEditor ? 'Fechar edição' : 'Editar solicitação'}
+                </GhostButton>
+              }
+            />
 
-              <p className="panel-copy">{selectedRequest.description}</p>
+            <p className="panel-copy">{selectedRequest.description}</p>
 
+            <div className="tag-row">
+              {selectedDepartment ? <DepartmentPill department={selectedDepartment} /> : null}
+              <StatusPill value={selectedRequest.status} />
+              <PriorityPill value={selectedRequest.priority} />
+              <span className="tag">Prazo {formatShortDate(selectedRequest.dueAt)}</span>
+              <span className="tag">Aberta em {formatShortDate(selectedRequest.openedAt)}</span>
+            </div>
+
+            <div className="detail-grid">
+              <div className="detail-block">
+                <span className="detail-block__label">Responsável</span>
+                <strong>{selectedRequest.owner}</strong>
+              </div>
+              <div className="detail-block">
+                <span className="detail-block__label">Solicitante</span>
+                <strong>{selectedRequest.requester}</strong>
+              </div>
+              <div className="detail-block">
+                <span className="detail-block__label">Prazo final</span>
+                <strong>{formatShortDate(selectedRequest.dueAt)}</strong>
+              </div>
+              <div className="detail-block">
+                <span className="detail-block__label">SLA</span>
+                <strong>{relativeSlaText(selectedRequest.dueAt)}</strong>
+              </div>
+            </div>
+
+            {selectedRequest.tags.length > 0 ? (
               <div className="tag-row">
-                {selectedDepartment ? <DepartmentPill department={selectedDepartment} /> : null}
-                <StatusPill value={selectedRequest.status} />
-                <PriorityPill value={selectedRequest.priority} />
-                <span className="tag">Prazo {formatShortDate(selectedRequest.dueAt)}</span>
-                <span className="tag">Aberta em {formatShortDate(selectedRequest.openedAt)}</span>
+                {selectedRequest.tags.map((tag) => (
+                  <span className="tag" key={tag}>
+                    {tag}
+                  </span>
+                ))}
               </div>
-
-              <div className="detail-grid">
-                <div className="detail-block">
-                  <span className="detail-block__label">Responsável</span>
-                  <strong>{selectedRequest.owner}</strong>
-                </div>
-                <div className="detail-block">
-                  <span className="detail-block__label">Solicitante</span>
-                  <strong>{selectedRequest.requester}</strong>
-                </div>
-                <div className="detail-block">
-                  <span className="detail-block__label">Prazo final</span>
-                  <strong>{formatShortDate(selectedRequest.dueAt)}</strong>
-                </div>
-                <div className="detail-block">
-                  <span className="detail-block__label">SLA</span>
-                  <strong>{relativeSlaText(selectedRequest.dueAt)}</strong>
-                </div>
-              </div>
-
-              {selectedRequest.tags.length > 0 ? (
-                <div className="tag-row">
-                  {selectedRequest.tags.map((tag) => (
-                    <span className="tag" key={tag}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : null}
-            </Panel>
-
-            {showEditor ? (
-              <Panel>
-                <SectionHeader
-                  eyebrow="Edição direta"
-                  title="Atualizar dados da solicitação"
-                  description="Ajuste escopo, prazo, prioridade e responsável sem sair da tela."
-                />
-
-                <form className="form-grid" onSubmit={handleSaveRequest}>
-                  <label>
-                    Título
-                    <input
-                      value={editForm.title}
-                      onChange={(event) => updateEditForm('title', event.target.value)}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    Solicitante
-                    <input
-                      value={editForm.requester}
-                      onChange={(event) => updateEditForm('requester', event.target.value)}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    Departamento responsável
-                    <select
-                      value={editForm.departmentId}
-                      onChange={(event) =>
-                        updateEditForm(
-                          'departmentId',
-                          event.target.value as UpdateRequestInput['departmentId'],
-                        )
-                      }
-                    >
-                      {departments.map((department) => (
-                        <option key={department.id} value={department.id}>
-                          {department.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label>
-                    Prioridade
-                    <select
-                      value={editForm.priority}
-                      onChange={(event) =>
-                        updateEditForm(
-                          'priority',
-                          event.target.value as UpdateRequestInput['priority'],
-                        )
-                      }
-                    >
-                      <option value="Baixa">Baixa</option>
-                      <option value="Média">Média</option>
-                      <option value="Alta">Alta</option>
-                      <option value="Crítica">Crítica</option>
-                    </select>
-                  </label>
-
-                  <label>
-                    Prazo
-                    <input
-                      type="datetime-local"
-                      value={editForm.dueAt}
-                      onChange={(event) => updateEditForm('dueAt', event.target.value)}
-                      required
-                    />
-                  </label>
-
-                  <label>
-                    Responsável
-                    <input
-                      value={editForm.owner}
-                      onChange={(event) => updateEditForm('owner', event.target.value)}
-                      required
-                    />
-                  </label>
-
-                  <label className="form-grid__full">
-                    Descrição
-                    <textarea
-                      value={editForm.description}
-                      onChange={(event) => updateEditForm('description', event.target.value)}
-                      rows={5}
-                      required
-                    />
-                  </label>
-
-                  <div className="form-grid__actions">
-                    <GhostButton
-                      type="button"
-                      onClick={() => {
-                        setEditForm(buildEditForm(selectedRequest));
-                        setShowEditor(false);
-                      }}
-                    >
-                      Cancelar
-                    </GhostButton>
-                    <AccentButton
-                      disabled={
-                        isPending ||
-                        !editForm.title ||
-                        !editForm.requester ||
-                        !editForm.owner ||
-                        !canSaveDraft
-                      }
-                    >
-                      {isPending ? 'Salvando...' : 'Salvar alterações'}
-                    </AccentButton>
-                  </div>
-                </form>
-              </Panel>
             ) : null}
+          </Panel>
 
-            <Panel>
+          <Panel>
+            <SectionHeader
+              eyebrow="Contexto operacional"
+              title="Comentários e avanço da solicitação"
+              description="O registro de andamento continua obrigatório antes de mover a solicitação no fluxo."
+            />
+
+            <form
+              className="form-grid"
+              onSubmit={(event) => {
+                event.preventDefault();
+                handleAddRequestComment();
+              }}
+            >
+              <label>
+                Autor do registro
+                <input
+                  value={requestComment.author}
+                  onChange={(event) =>
+                    setRequestComment((current) => ({
+                      ...current,
+                      author: event.target.value,
+                    }))
+                  }
+                  placeholder="Quem está atualizando a solicitação"
+                  required
+                />
+              </label>
+
+              <label className="form-grid__full">
+                Comentário de andamento
+                <textarea
+                  value={requestComment.message}
+                  onChange={(event) =>
+                    setRequestComment((current) => ({
+                      ...current,
+                      message: event.target.value,
+                    }))
+                  }
+                  placeholder="Ex.: Ajuste em execução, aguardando validação do Financeiro e revisão final do escopo."
+                  rows={4}
+                  required
+                />
+              </label>
+
+              <div className="form-grid__actions">
+                <GhostButton disabled={isPending || !hasCommentMessage}>
+                  {isPending ? 'Registrando...' : 'Salvar comentário'}
+                </GhostButton>
+                <AccentButton
+                  type="button"
+                  onClick={handleAdvanceWithContext}
+                  disabled={
+                    isPending || selectedRequest.status === 'Concluída' || !hasCommentMessage
+                  }
+                >
+                  {selectedRequest.status === 'Concluída'
+                    ? 'Fluxo concluído'
+                    : selectedRequest.status === 'Validação'
+                      ? 'Registrar e concluir'
+                      : 'Registrar e avançar'}
+                </AccentButton>
+              </div>
+            </form>
+
+            {requestComments.length > 0 ? (
+              <div className="feed">
+                {requestComments.map((comment) => (
+                  <article className="feed-item" key={comment.id}>
+                    <div className="feed-item__content">
+                      <div className="feed-item__header">
+                        <strong>{comment.author}</strong>
+                        <span>{formatDateTime(comment.createdAt)}</span>
+                      </div>
+                      <p>{comment.message}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Ainda não há comentários nesta solicitação.</p>
+            )}
+          </Panel>
+
+          {showEditor ? (
+            <Panel className="request-detail-layout__full">
               <SectionHeader
-                eyebrow="Contexto operacional"
-                title="Comentários e histórico da solicitação"
-                description="Registre o que está sendo feito antes de avançar ou concluir a demanda."
+                eyebrow="Edição direta"
+                title="Atualizar dados da solicitação"
+                description="Ajuste escopo, prazo, prioridade e responsável sem sair do contexto da fila."
               />
 
-              <form
-                className="form-grid"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  handleAddRequestComment();
-                }}
-              >
+              <form className="form-grid form-grid--compact" onSubmit={handleSaveRequest}>
                 <label>
-                  Autor do registro
+                  Título
                   <input
-                    value={requestComment.author}
+                    value={editForm.title}
+                    onChange={(event) => updateEditForm('title', event.target.value)}
+                    required
+                  />
+                </label>
+
+                <label>
+                  Solicitante
+                  <input
+                    value={editForm.requester}
+                    onChange={(event) => updateEditForm('requester', event.target.value)}
+                    required
+                  />
+                </label>
+
+                <label>
+                  Departamento responsável
+                  <select
+                    value={editForm.departmentId}
                     onChange={(event) =>
-                      setRequestComment((current) => ({
-                        ...current,
-                        author: event.target.value,
-                      }))
+                      updateEditForm(
+                        'departmentId',
+                        event.target.value as UpdateRequestInput['departmentId'],
+                      )
                     }
-                    placeholder="Quem está atualizando a solicitação"
+                  >
+                    {departments.map((department) => (
+                      <option key={department.id} value={department.id}>
+                        {department.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  Prioridade
+                  <select
+                    value={editForm.priority}
+                    onChange={(event) =>
+                      updateEditForm(
+                        'priority',
+                        event.target.value as UpdateRequestInput['priority'],
+                      )
+                    }
+                  >
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Crítica">Crítica</option>
+                  </select>
+                </label>
+
+                <label>
+                  Prazo
+                  <input
+                    type="datetime-local"
+                    value={editForm.dueAt}
+                    onChange={(event) => updateEditForm('dueAt', event.target.value)}
+                    required
+                  />
+                </label>
+
+                <label>
+                  Responsável
+                  <input
+                    value={editForm.owner}
+                    onChange={(event) => updateEditForm('owner', event.target.value)}
                     required
                   />
                 </label>
 
                 <label className="form-grid__full">
-                  Comentário de andamento
+                  Descrição
                   <textarea
-                    value={requestComment.message}
-                    onChange={(event) =>
-                      setRequestComment((current) => ({
-                        ...current,
-                        message: event.target.value,
-                      }))
-                    }
-                    placeholder="Ex.: Ajuste em execução, aguardando validação do Financeiro e revisão final do escopo."
-                    rows={4}
+                    value={editForm.description}
+                    onChange={(event) => updateEditForm('description', event.target.value)}
+                    rows={5}
                     required
                   />
                 </label>
 
                 <div className="form-grid__actions">
-                  <GhostButton disabled={isPending || !hasCommentMessage}>
-                    {isPending ? 'Registrando...' : 'Salvar comentário'}
+                  <GhostButton
+                    type="button"
+                    onClick={() => {
+                      setEditForm(buildEditForm(selectedRequest));
+                      setShowEditor(false);
+                    }}
+                  >
+                    Cancelar
                   </GhostButton>
                   <AccentButton
-                    type="button"
-                    onClick={handleAdvanceWithContext}
                     disabled={
                       isPending ||
-                      selectedRequest.status === 'Concluída' ||
-                      !hasCommentMessage
+                      !editForm.title ||
+                      !editForm.requester ||
+                      !editForm.owner ||
+                      !canSaveDraft
                     }
                   >
-                    {selectedRequest.status === 'Concluída'
-                      ? 'Fluxo concluído'
-                      : selectedRequest.status === 'Validação'
-                        ? 'Registrar e concluir'
-                        : 'Registrar e avançar'}
+                    {isPending ? 'Salvando...' : 'Salvar alterações'}
                   </AccentButton>
                 </div>
               </form>
+            </Panel>
+          ) : null}
 
-              {requestComments.length > 0 ? (
+          <Panel className="request-detail-layout__full">
+            <div className="detail-stack">
+              <SectionHeader
+                eyebrow="Dependências"
+                title="Tarefas vinculadas"
+                description="As tarefas ligadas à solicitação seguem acessíveis com o mesmo histórico contextual."
+              />
+              {relatedTasks.length > 0 ? (
                 <div className="feed">
-                  {requestComments.map((comment) => (
-                    <article className="feed-item" key={comment.id}>
-                      <div className="feed-item__content">
-                        <div className="feed-item__header">
-                          <strong>{comment.author}</strong>
-                          <span>{formatDateTime(comment.createdAt)}</span>
+                  {relatedTasks.map((task) => {
+                    const latestTaskComment = comments.find(
+                      (comment) =>
+                        comment.entityType === 'task' && comment.entityId === task.id,
+                    );
+
+                    return (
+                      <article className="feed-item" key={task.id}>
+                        <div className="feed-item__content">
+                          <div className="feed-item__header">
+                            <strong>{task.title}</strong>
+                            <StatusPill value={task.status} />
+                          </div>
+                          <p>
+                            {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforço{' '}
+                            {task.effort}
+                          </p>
+                          {latestTaskComment ? (
+                            <p>Último comentário: {latestTaskComment.message}</p>
+                          ) : null}
                         </div>
-                        <p>{comment.message}</p>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               ) : (
-                <p className="empty-state">
-                  Ainda não há comentários nesta solicitação.
-                </p>
+                <p className="empty-state">Nenhuma tarefa vinculada encontrada.</p>
               )}
-            </Panel>
-
-            <Panel>
-              <div className="detail-stack">
-                <SectionHeader
-                  eyebrow="Dependências"
-                  title="Tarefas vinculadas"
-                  description="Cada tarefa também pode registrar contexto próprio no quadro de execução."
-                />
-                {relatedTasks.length > 0 ? (
-                  <div className="feed">
-                    {relatedTasks.map((task) => {
-                      const latestTaskComment = comments.find(
-                        (comment) =>
-                          comment.entityType === 'task' && comment.entityId === task.id,
-                      );
-
-                      return (
-                        <article className="feed-item" key={task.id}>
-                          <div className="feed-item__content">
-                            <div className="feed-item__header">
-                              <strong>{task.title}</strong>
-                              <StatusPill value={task.status} />
-                            </div>
-                            <p>
-                              {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforço{' '}
-                              {task.effort}
-                            </p>
-                            {latestTaskComment ? (
-                              <p>
-                                Último comentário: {latestTaskComment.message}
-                              </p>
-                            ) : null}
-                          </div>
-                        </article>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="empty-state">Nenhuma tarefa vinculada encontrada.</p>
-                )}
-              </div>
-            </Panel>
-          </div>
-        ) : (
-          <Panel>
-            <p className="empty-state">
-              Selecione uma solicitação para visualizar os detalhes.
-            </p>
+            </div>
           </Panel>
-        )}
-      </div>
+        </div>
+      ) : (
+        <Panel>
+          <p className="empty-state">
+            Selecione uma solicitação para visualizar os detalhes.
+          </p>
+        </Panel>
+      )}
     </div>
   );
 }
