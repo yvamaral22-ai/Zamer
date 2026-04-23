@@ -14,23 +14,23 @@ function joinClasses(...classNames: Array<string | false | undefined>) {
 const requestStatusClass: Record<RequestStatus, string> = {
   Nova: 'status-pill--new',
   Triagem: 'status-pill--triage',
-  Execucao: 'status-pill--execution',
-  Validacao: 'status-pill--validation',
-  Concluida: 'status-pill--done',
+  Execução: 'status-pill--execution',
+  Validação: 'status-pill--validation',
+  Concluída: 'status-pill--done',
 };
 
 const taskStatusClass: Record<TaskStatus, string> = {
   Planejada: 'status-pill--planned',
   'Em progresso': 'status-pill--progress',
   Bloqueada: 'status-pill--blocked',
-  Concluida: 'status-pill--done',
+  Concluída: 'status-pill--done',
 };
 
 const priorityClass: Record<RequestPriority, string> = {
   Baixa: 'priority-pill--low',
-  Media: 'priority-pill--medium',
+  Média: 'priority-pill--medium',
   Alta: 'priority-pill--high',
-  Critica: 'priority-pill--critical',
+  Crítica: 'priority-pill--critical',
 };
 
 export function Panel({

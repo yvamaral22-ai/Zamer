@@ -27,19 +27,19 @@ const boardStatusClass: Record<TaskStatus, string> = {
   Planejada: 'board__column--planned',
   'Em progresso': 'board__column--progress',
   Bloqueada: 'board__column--blocked',
-  Concluida: 'board__column--done',
+  Concluída: 'board__column--done',
 };
 
 function taskCountLabel(count: number) {
-  return `${count} ${count === 1 ? 'task' : 'tasks'}`;
+  return `${count} ${count === 1 ? 'tarefa' : 'tarefas'}`;
 }
 
 function columnSummary(status: TaskStatus, count: number, atRiskCount: number) {
   if (count === 0) {
-    return 'Sem movimentacao nesta etapa.';
+    return 'Sem movimentação nesta etapa.';
   }
 
-  if (status === 'Concluida') {
+  if (status === 'Concluída') {
     return `${taskCountLabel(count)} com contexto final registrado.`;
   }
 
@@ -48,10 +48,10 @@ function columnSummary(status: TaskStatus, count: number, atRiskCount: number) {
   }
 
   if (atRiskCount > 0) {
-    return `${atRiskCount} exigem atencao imediata de prazo.`;
+    return `${atRiskCount} exigem atenção imediata ao prazo.`;
   }
 
-  return `${taskCountLabel(count)} distribuidas com acompanhamento ativo.`;
+  return `${taskCountLabel(count)} distribuídas com acompanhamento ativo.`;
 }
 
 function TaskBoardCard({
@@ -96,21 +96,21 @@ function TaskBoardCard({
   const nextStatus = taskStatusOrder[Math.min(index + 1, taskStatusOrder.length - 1)];
   const hasCommentMessage = commentForm.message.trim().length > 0;
   const latestComment = comments[0];
-  const commentCountLabel = `${comments.length} ${comments.length === 1 ? 'comentario' : 'comentarios'}`;
+  const commentCountLabel = `${comments.length} ${comments.length === 1 ? 'comentário' : 'comentários'}`;
   const previewLabel = task.blockedReason
     ? 'Bloqueio ativo'
     : latestComment
-      ? `Ultimo contexto por ${latestComment.author}`
+      ? `Último contexto por ${latestComment.author}`
       : isRisk
-        ? 'Task em atencao imediata'
-        : 'Task pronta para atualizacao';
+        ? 'Tarefa em atenção imediata'
+        : 'Tarefa pronta para atualização';
   const previewMeta = latestComment
     ? formatDateTime(latestComment.createdAt)
     : `Prazo ${formatShortDate(task.dueAt)}`;
   const previewText =
     task.blockedReason ??
     latestComment?.message ??
-    'Abra os detalhes para registrar contexto, comentar a execucao e mover a task com mais clareza.';
+    'Abra os detalhes para registrar contexto, comentar a execução e mover a tarefa com mais clareza.';
 
   return (
     <article
@@ -163,7 +163,7 @@ function TaskBoardCard({
           >
             {relativeSlaText(task.dueAt)}
           </span>
-          <span className="task-card__meta-chip">Esforco {task.effort}</span>
+          <span className="task-card__meta-chip">Esforço {task.effort}</span>
           <span className="task-card__meta-chip">{commentCountLabel}</span>
         </div>
       </button>
@@ -183,11 +183,11 @@ function TaskBoardCard({
         <div className="task-card__expanded-panel">
           <div className="task-card__detail-grid">
             <div className="task-card__detail-item">
-              <span>Solicitacao</span>
+              <span>Solicitação</span>
               <strong>{requestTitle}</strong>
             </div>
             <div className="task-card__detail-item">
-              <span>Responsavel</span>
+              <span>Responsável</span>
               <strong>{task.assignee}</strong>
             </div>
             <div className="task-card__detail-item">
@@ -195,14 +195,14 @@ function TaskBoardCard({
               <strong>{formatShortDate(task.dueAt)}</strong>
             </div>
             <div className="task-card__detail-item">
-              <span>Esforco estimado</span>
+              <span>Esforço estimado</span>
               <strong>{task.effort}</strong>
             </div>
           </div>
 
           <div className="task-card__comment-stack">
             <label className="task-card__field">
-              Autor do comentario
+              Autor do comentário
               <input
                 value={commentForm.author}
                 onChange={(event) =>
@@ -211,7 +211,7 @@ function TaskBoardCard({
                     author: event.target.value,
                   }))
                 }
-                placeholder="Quem esta atualizando a task"
+                placeholder="Quem está atualizando a tarefa"
               />
             </label>
 
@@ -225,7 +225,7 @@ function TaskBoardCard({
                     message: event.target.value,
                   }))
                 }
-                placeholder="Ex.: Implementacao em andamento, testes iniciados e dependencia externa ainda pendente."
+                placeholder="Ex.: Implementação em andamento, testes iniciados e dependência externa ainda pendente."
                 rows={3}
               />
             </label>
@@ -262,7 +262,7 @@ function TaskBoardCard({
                 }));
               }}
             >
-              Registrar comentario
+              Registrar comentário
             </GhostButton>
 
             <GhostButton
@@ -287,7 +287,7 @@ function TaskBoardCard({
                 }));
               }}
             >
-              {nextStatus === 'Concluida' ? 'Concluir com contexto' : 'Avancar com contexto'}
+              {nextStatus === 'Concluída' ? 'Concluir com contexto' : 'Avançar com contexto'}
             </AccentButton>
           </div>
         </div>
@@ -321,7 +321,7 @@ export function TasksPage() {
 
   const blockedTasks = visibleTasks.filter((task) => task.status === 'Bloqueada').length;
   const tasksNearDeadline = visibleTasks.filter(
-    (task) => task.status !== 'Concluida' && isCriticalDeadline(task.dueAt),
+    (task) => task.status !== 'Concluída' && isCriticalDeadline(task.dueAt),
   ).length;
 
   useEffect(() => {
@@ -364,16 +364,16 @@ export function TasksPage() {
   return (
     <div className="workspace reveal">
       <SectionHeader
-        eyebrow="Execucao rastreavel"
+        eyebrow="Execução rastreável"
         title="Quadro de tarefas por etapa"
-        description="Cada card agora aceita comentario de andamento antes de avancar ou concluir a execucao."
+        description="Cada card agora aceita comentário de andamento antes de avançar ou concluir a execução."
         action={
           <select
             className="select-inline"
             value={departmentFilter}
             onChange={(event) => setDepartmentFilter(event.target.value as DepartmentFilter)}
           >
-            <option value="Todas">Todas as areas</option>
+            <option value="Todas">Todas as áreas</option>
             {departments.map((department) => (
               <option key={department.id} value={department.id}>
                 {department.name}
@@ -385,19 +385,19 @@ export function TasksPage() {
 
       <div className="metric-grid">
         <div className="metric-card">
-          <span className="metric-card__label">Tasks filtradas</span>
+          <span className="metric-card__label">Tarefas filtradas</span>
           <strong className="metric-card__value">{visibleTasks.length}</strong>
           <span className="metric-card__note">Total atual no quadro</span>
         </div>
         <div className="metric-card">
           <span className="metric-card__label">Bloqueios</span>
           <strong className="metric-card__value">{blockedTasks}</strong>
-          <span className="metric-card__note">Itens esperando decisao ou insumo</span>
+          <span className="metric-card__note">Itens aguardando decisão ou insumo</span>
         </div>
         <div className="metric-card">
-          <span className="metric-card__label">Prazos criticos</span>
+          <span className="metric-card__label">Prazos críticos</span>
           <strong className="metric-card__value">{tasksNearDeadline}</strong>
-          <span className="metric-card__note">Tasks com prazo em ate 2 dias</span>
+          <span className="metric-card__note">Tarefas com prazo em até 2 dias</span>
         </div>
       </div>
 
@@ -440,7 +440,7 @@ export function TasksPage() {
                       onToggle={() =>
                         setExpandedTaskId((current) => (current === task.id ? null : task.id))
                       }
-                      requestTitle={request?.title ?? 'Solicitacao vinculada'}
+                      requestTitle={request?.title ?? 'Solicitação vinculada'}
                       task={task}
                     />
                   );
@@ -449,7 +449,7 @@ export function TasksPage() {
                 {columnTasks.length === 0 ? (
                   <div className="empty-state empty-state--board">
                     <strong>Quadro limpo</strong>
-                    <span>Nenhuma task precisa de acompanhamento nesta etapa.</span>
+                    <span>Nenhuma tarefa precisa de acompanhamento nesta etapa.</span>
                   </div>
                 ) : null}
               </div>

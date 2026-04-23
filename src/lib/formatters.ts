@@ -51,7 +51,7 @@ export function relativeSlaText(value: string) {
 }
 
 export function isOpenRequest(status: RequestStatus) {
-  return status !== 'Concluida';
+  return status !== 'Concluída';
 }
 
 export function isCriticalDeadline(value: string) {

@@ -20,7 +20,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: 'IntegraFlow',
   description:
-    'Prototipo de sistema corporativo para gestao integrada de solicitacoes, tarefas e comunicacao entre departamentos.',
+    'Protótipo de sistema corporativo para gestão integrada de solicitações, tarefas e comunicação entre departamentos.',
 };
 
 export default function RootLayout({

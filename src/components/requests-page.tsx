@@ -33,7 +33,7 @@ const initialForm: NewRequestInput = {
   title: '',
   requester: '',
   departmentId: 'ti',
-  priority: 'Media',
+  priority: 'Média',
   dueAt: '2026-04-15T18:00',
   description: '',
 };
@@ -43,7 +43,7 @@ const emptyEditForm: UpdateRequestInput = {
   title: '',
   requester: '',
   departmentId: 'ti',
-  priority: 'Media',
+  priority: 'Média',
   dueAt: '2026-04-15T18:00',
   description: '',
   owner: '',
@@ -170,11 +170,11 @@ export function RequestsPage() {
     (request) =>
       isOpenRequest(request.status) &&
       (request.priority === 'Alta' ||
-        request.priority === 'Critica' ||
+        request.priority === 'Crítica' ||
         isCriticalDeadline(request.dueAt)),
   ).length;
   const validationRequests = requests.filter(
-    (request) => request.status === 'Validacao',
+    (request) => request.status === 'Validação',
   ).length;
   const canSaveDraft = hasDraftChanges(editForm, selectedRequest);
   const hasCommentMessage = requestComment.message.trim().length > 0;
@@ -263,29 +263,29 @@ export function RequestsPage() {
   return (
     <div className="workspace reveal">
       <SectionHeader
-        eyebrow="Gestao centralizada"
-        title="Solicitacoes com contexto, prioridade e SLA no mesmo fluxo"
-        description="A tela agora permite editar a demanda selecionada e registrar andamento antes de avancar o fluxo."
+        eyebrow="Gestão centralizada"
+        title="Solicitações com contexto, prioridade e SLA no mesmo fluxo"
+        description="A tela agora permite editar a demanda selecionada e registrar andamento antes de avançar o fluxo."
         action={
           <GhostButton onClick={() => setShowComposer((current) => !current)}>
-            {showComposer ? 'Fechar formulario' : 'Nova solicitacao'}
+            {showComposer ? 'Fechar formulário' : 'Nova solicitação'}
           </GhostButton>
         }
       />
 
       <div className="metric-grid">
         <MetricCard
-          label="Solicitacoes abertas"
+          label="Solicitações abertas"
           value={String(openRequests)}
           note="Demandas ainda em andamento no fluxo"
         />
         <MetricCard
-          label="Fila prioritaria"
+          label="Fila prioritária"
           value={String(urgentRequests)}
           note="Itens de alta criticidade ou prazo curto"
         />
         <MetricCard
-          label="Em validacao"
+          label="Em validação"
           value={String(validationRequests)}
           note="Demandas aguardando aceite final"
         />
@@ -295,17 +295,17 @@ export function RequestsPage() {
         <Panel>
           <SectionHeader
             eyebrow="Entrada do fluxo"
-            title="Registrar nova solicitacao"
-            description="Ao cadastrar a demanda, o sistema ja cria a primeira task da area responsavel."
+            title="Registrar nova solicitação"
+            description="Ao cadastrar a demanda, o sistema já cria a primeira tarefa da área responsável."
           />
 
           <form className="form-grid" onSubmit={handleSubmit}>
             <label>
-              Titulo
+              Título
               <input
                 value={form.title}
                 onChange={(event) => updateForm('title', event.target.value)}
-                placeholder="Ex.: Automatizar aprovacao de adiantamentos"
+                placeholder="Ex.: Automatizar aprovação de adiantamentos"
                 required
               />
             </label>
@@ -345,9 +345,9 @@ export function RequestsPage() {
                 }
               >
                 <option value="Baixa">Baixa</option>
-                <option value="Media">Media</option>
+                <option value="Média">Média</option>
                 <option value="Alta">Alta</option>
-                <option value="Critica">Critica</option>
+                <option value="Crítica">Crítica</option>
               </select>
             </label>
 
@@ -362,7 +362,7 @@ export function RequestsPage() {
             </label>
 
             <label className="form-grid__full">
-              Descricao
+              Descrição
               <textarea
                 value={form.description}
                 onChange={(event) => updateForm('description', event.target.value)}
@@ -374,7 +374,7 @@ export function RequestsPage() {
 
             <div className="form-grid__actions">
               <AccentButton disabled={isPending || !form.title || !form.requester}>
-                {isPending ? 'Registrando...' : 'Criar solicitacao'}
+                {isPending ? 'Registrando...' : 'Criar solicitação'}
               </AccentButton>
             </div>
           </form>
@@ -385,7 +385,7 @@ export function RequestsPage() {
         <Panel>
           <SectionHeader
             eyebrow="Fila operacional"
-            title="Lista de solicitacoes"
+            title="Lista de solicitações"
             description="Pesquise, filtre e selecione uma demanda para analisar detalhes, editar dados e registrar contexto."
           />
 
@@ -393,7 +393,7 @@ export function RequestsPage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Buscar por titulo, solicitante ou codigo"
+              placeholder="Buscar por título, solicitante ou código"
             />
             <select
               value={statusFilter}
@@ -402,15 +402,15 @@ export function RequestsPage() {
               <option value="Todas">Todas</option>
               <option value="Nova">Nova</option>
               <option value="Triagem">Triagem</option>
-              <option value="Execucao">Execucao</option>
-              <option value="Validacao">Validacao</option>
-              <option value="Concluida">Concluida</option>
+              <option value="Execução">Execução</option>
+              <option value="Validação">Validação</option>
+              <option value="Concluída">Concluída</option>
             </select>
           </div>
 
           <div className="list-summary">
             <span>{filteredRequests.length} resultados exibidos</span>
-            <span>Selecione uma solicitacao para abrir o contexto completo</span>
+            <span>Selecione uma solicitação para abrir o contexto completo</span>
           </div>
 
           {filteredRequests.length > 0 ? (
@@ -448,7 +448,7 @@ export function RequestsPage() {
               })}
             </div>
           ) : (
-            <p className="empty-state">Nenhuma solicitacao encontrada com os filtros atuais.</p>
+            <p className="empty-state">Nenhuma solicitação encontrada com os filtros atuais.</p>
           )}
         </Panel>
 
@@ -458,10 +458,10 @@ export function RequestsPage() {
               <SectionHeader
                 eyebrow={selectedRequest.id}
                 title={selectedRequest.title}
-                description="Os detalhes ficam editaveis e a evolucao do fluxo passa a exigir contexto registrado."
+                description="Os detalhes ficam editáveis, e a evolução do fluxo passa a exigir contexto registrado."
                 action={
                   <GhostButton onClick={() => setShowEditor((current) => !current)}>
-                    {showEditor ? 'Fechar edicao' : 'Editar solicitacao'}
+                    {showEditor ? 'Fechar edição' : 'Editar solicitação'}
                   </GhostButton>
                 }
               />
@@ -478,7 +478,7 @@ export function RequestsPage() {
 
               <div className="detail-grid">
                 <div className="detail-block">
-                  <span className="detail-block__label">Responsavel</span>
+                  <span className="detail-block__label">Responsável</span>
                   <strong>{selectedRequest.owner}</strong>
                 </div>
                 <div className="detail-block">
@@ -509,14 +509,14 @@ export function RequestsPage() {
             {showEditor ? (
               <Panel>
                 <SectionHeader
-                  eyebrow="Edicao direta"
-                  title="Atualizar dados da solicitacao"
-                  description="Ajuste escopo, prazo, prioridade e ownership sem sair da tela."
+                  eyebrow="Edição direta"
+                  title="Atualizar dados da solicitação"
+                  description="Ajuste escopo, prazo, prioridade e responsável sem sair da tela."
                 />
 
                 <form className="form-grid" onSubmit={handleSaveRequest}>
                   <label>
-                    Titulo
+                    Título
                     <input
                       value={editForm.title}
                       onChange={(event) => updateEditForm('title', event.target.value)}
@@ -534,7 +534,7 @@ export function RequestsPage() {
                   </label>
 
                   <label>
-                    Departamento responsavel
+                    Departamento responsável
                     <select
                       value={editForm.departmentId}
                       onChange={(event) =>
@@ -564,9 +564,9 @@ export function RequestsPage() {
                       }
                     >
                       <option value="Baixa">Baixa</option>
-                      <option value="Media">Media</option>
+                      <option value="Média">Média</option>
                       <option value="Alta">Alta</option>
-                      <option value="Critica">Critica</option>
+                      <option value="Crítica">Crítica</option>
                     </select>
                   </label>
 
@@ -581,7 +581,7 @@ export function RequestsPage() {
                   </label>
 
                   <label>
-                    Responsavel
+                    Responsável
                     <input
                       value={editForm.owner}
                       onChange={(event) => updateEditForm('owner', event.target.value)}
@@ -590,7 +590,7 @@ export function RequestsPage() {
                   </label>
 
                   <label className="form-grid__full">
-                    Descricao
+                    Descrição
                     <textarea
                       value={editForm.description}
                       onChange={(event) => updateEditForm('description', event.target.value)}
@@ -618,7 +618,7 @@ export function RequestsPage() {
                         !canSaveDraft
                       }
                     >
-                      {isPending ? 'Salvando...' : 'Salvar alteracoes'}
+                      {isPending ? 'Salvando...' : 'Salvar alterações'}
                     </AccentButton>
                   </div>
                 </form>
@@ -628,8 +628,8 @@ export function RequestsPage() {
             <Panel>
               <SectionHeader
                 eyebrow="Contexto operacional"
-                title="Comentarios e historico da solicitacao"
-                description="Registre o que esta sendo feito antes de avancar ou concluir a demanda."
+                title="Comentários e histórico da solicitação"
+                description="Registre o que está sendo feito antes de avançar ou concluir a demanda."
               />
 
               <form
@@ -649,13 +649,13 @@ export function RequestsPage() {
                         author: event.target.value,
                       }))
                     }
-                    placeholder="Quem esta atualizando a solicitacao"
+                    placeholder="Quem está atualizando a solicitação"
                     required
                   />
                 </label>
 
                 <label className="form-grid__full">
-                  Comentario de andamento
+                  Comentário de andamento
                   <textarea
                     value={requestComment.message}
                     onChange={(event) =>
@@ -664,7 +664,7 @@ export function RequestsPage() {
                         message: event.target.value,
                       }))
                     }
-                    placeholder="Ex.: Ajuste em execucao, aguardando validacao do financeiro e revisao final do escopo."
+                    placeholder="Ex.: Ajuste em execução, aguardando validação do Financeiro e revisão final do escopo."
                     rows={4}
                     required
                   />
@@ -672,22 +672,22 @@ export function RequestsPage() {
 
                 <div className="form-grid__actions">
                   <GhostButton disabled={isPending || !hasCommentMessage}>
-                    {isPending ? 'Registrando...' : 'Salvar comentario'}
+                    {isPending ? 'Registrando...' : 'Salvar comentário'}
                   </GhostButton>
                   <AccentButton
                     type="button"
                     onClick={handleAdvanceWithContext}
                     disabled={
                       isPending ||
-                      selectedRequest.status === 'Concluida' ||
+                      selectedRequest.status === 'Concluída' ||
                       !hasCommentMessage
                     }
                   >
-                    {selectedRequest.status === 'Concluida'
-                      ? 'Fluxo concluido'
-                      : selectedRequest.status === 'Validacao'
+                    {selectedRequest.status === 'Concluída'
+                      ? 'Fluxo concluído'
+                      : selectedRequest.status === 'Validação'
                         ? 'Registrar e concluir'
-                        : 'Registrar e avancar'}
+                        : 'Registrar e avançar'}
                   </AccentButton>
                 </div>
               </form>
@@ -708,7 +708,7 @@ export function RequestsPage() {
                 </div>
               ) : (
                 <p className="empty-state">
-                  Ainda nao ha comentarios nesta solicitacao.
+                  Ainda não há comentários nesta solicitação.
                 </p>
               )}
             </Panel>
@@ -716,9 +716,9 @@ export function RequestsPage() {
             <Panel>
               <div className="detail-stack">
                 <SectionHeader
-                  eyebrow="Dependencias"
-                  title="Tasks vinculadas"
-                  description="Cada task tambem pode registrar contexto proprio no quadro de execucao."
+                  eyebrow="Dependências"
+                  title="Tarefas vinculadas"
+                  description="Cada tarefa também pode registrar contexto próprio no quadro de execução."
                 />
                 {relatedTasks.length > 0 ? (
                   <div className="feed">
@@ -736,12 +736,12 @@ export function RequestsPage() {
                               <StatusPill value={task.status} />
                             </div>
                             <p>
-                              {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforco{' '}
+                              {task.assignee} | prazo {formatShortDate(task.dueAt)} | esforço{' '}
                               {task.effort}
                             </p>
                             {latestTaskComment ? (
                               <p>
-                                Ultimo comentario: {latestTaskComment.message}
+                                Último comentário: {latestTaskComment.message}
                               </p>
                             ) : null}
                           </div>
@@ -750,7 +750,7 @@ export function RequestsPage() {
                     })}
                   </div>
                 ) : (
-                  <p className="empty-state">Nenhuma task vinculada encontrada.</p>
+                  <p className="empty-state">Nenhuma tarefa vinculada encontrada.</p>
                 )}
               </div>
             </Panel>
@@ -758,7 +758,7 @@ export function RequestsPage() {
         ) : (
           <Panel>
             <p className="empty-state">
-              Selecione uma solicitacao para visualizar os detalhes.
+              Selecione uma solicitação para visualizar os detalhes.
             </p>
           </Panel>
         )}

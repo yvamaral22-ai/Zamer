@@ -16,6 +16,7 @@ import {
   buildUpdateBundle,
   createId,
   createInitialState,
+  migratePrototypeState,
   requestStatusOrder,
   taskStatusOrder,
 } from '@/lib/prototype-data';
@@ -73,7 +74,8 @@ type PrototypeAction =
       payload: ReturnType<typeof buildCommentBundle>;
     };
 
-const STORAGE_KEY = 'integraflow-prototype-v2';
+const STORAGE_KEY = 'integraflow-prototype-v3';
+const LEGACY_STORAGE_KEY = 'integraflow-prototype-v2';
 const PrototypeContext = createContext<PrototypeContextValue | null>(null);
 
 function nextRequestStatus(currentStatus: RequestStatus) {
@@ -104,7 +106,7 @@ function syncRequestTags(
   priority: UpdateRequestInput['priority'],
   departmentNames: string[],
 ) {
-  const priorityTags = new Set(['Baixa', 'Media', 'Alta', 'Critica']);
+  const priorityTags = new Set(['Baixa', 'Média', 'Alta', 'Crítica']);
   const departmentTagSet = new Set(departmentNames);
   const preserved = currentTags.filter(
     (tag) => !priorityTags.has(tag) && !departmentTagSet.has(tag),
@@ -133,7 +135,7 @@ function prototypeReducer(
         state.departments[0];
       const nextTags = syncRequestTags(
         state.requests.find((request) => request.id === action.payload.id)?.tags ?? [],
-        department?.name ?? 'Operacao',
+        department?.name ?? 'Operação',
         action.payload.priority,
         state.departments.map((item) => item.name),
       );
@@ -156,7 +158,7 @@ function prototypeReducer(
             : request,
         ),
         tasks: state.tasks.map((task) =>
-          task.requestId === action.payload.id && task.status !== 'Concluida'
+          task.requestId === action.payload.id && task.status !== 'Concluída'
             ? {
                 ...task,
                 departmentId: action.payload.departmentId,
@@ -168,7 +170,7 @@ function prototypeReducer(
         activities: prependActivity(state.activities, {
           id: createId('ACT'),
           kind: 'request',
-          label: 'Solicitacao atualizada',
+          label: 'Solicitação atualizada',
           highlight: action.payload.title,
           createdAt: new Date().toISOString(),
         }),
@@ -178,7 +180,7 @@ function prototypeReducer(
       let nextStatus: RequestStatus | null = null;
       let nextTitle = '';
       let nextDepartmentId = state.departments[0]?.id ?? 'ti';
-      let nextOwner = 'Coordenacao';
+      let nextOwner = 'Coordenação';
 
       const requests = state.requests.map((request) => {
         if (request.id !== action.requestId) {
@@ -200,12 +202,12 @@ function prototypeReducer(
       }
 
       const tasks =
-        nextStatus === 'Concluida'
+        nextStatus === 'Concluída'
           ? state.tasks.map((task) =>
               task.requestId === action.requestId
                 ? {
                     ...task,
-                    status: 'Concluida' as TaskStatus,
+                    status: 'Concluída' as TaskStatus,
                   }
                 : task,
             )
@@ -234,7 +236,7 @@ function prototypeReducer(
         activities: prependActivity(activities, {
           id: `ACT-STATUS-${action.requestId}-${Date.now()}`,
           kind: 'request',
-          label: `Solicitacao movida para ${nextStatus}`,
+          label: `Solicitação movida para ${nextStatus}`,
           highlight: nextTitle,
           createdAt: new Date().toISOString(),
         }),
@@ -245,7 +247,7 @@ function prototypeReducer(
       let nextTitle = '';
       let linkedRequestId = '';
       let nextDepartmentId = state.departments[0]?.id ?? 'ti';
-      let nextAssignee = 'Coordenacao';
+      let nextAssignee = 'Coordenação';
 
       const tasks = state.tasks.map((task) => {
         if (task.id !== action.taskId) {
@@ -269,12 +271,12 @@ function prototypeReducer(
       }
 
       const requests =
-        nextStatus === 'Concluida'
+        nextStatus === 'Concluída'
           ? state.requests.map((request) =>
-              request.id === linkedRequestId && request.status !== 'Concluida'
+              request.id === linkedRequestId && request.status !== 'Concluída'
                 ? {
                     ...request,
-                    status: 'Validacao' as RequestStatus,
+                    status: 'Validação' as RequestStatus,
                   }
                 : request,
             )
@@ -303,7 +305,7 @@ function prototypeReducer(
         activities: prependActivity(activities, {
           id: `ACT-TASK-${action.taskId}-${Date.now()}`,
           kind: 'task',
-          label: `Task movida para ${nextStatus}`,
+          label: `Tarefa movida para ${nextStatus}`,
           highlight: nextTitle,
           createdAt: new Date().toISOString(),
         }),
@@ -332,16 +334,19 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const cachedState = window.localStorage.getItem(STORAGE_KEY);
+      const cachedState =
+        window.localStorage.getItem(STORAGE_KEY) ??
+        window.localStorage.getItem(LEGACY_STORAGE_KEY);
 
       if (cachedState) {
         dispatch({
           type: 'hydrate',
-          payload: JSON.parse(cachedState) as PrototypeState,
+          payload: migratePrototypeState(JSON.parse(cachedState) as PrototypeState),
         });
       }
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
     } finally {
       setHydrated(true);
     }

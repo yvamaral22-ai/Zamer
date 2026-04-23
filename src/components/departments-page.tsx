@@ -15,7 +15,7 @@ import type { NewUpdateInput } from '@/lib/types';
 const initialUpdate: NewUpdateInput = {
   departmentId: 'ti',
   audience: 'Todos',
-  author: 'Coordenacao do projeto',
+  author: 'Coordenação do projeto',
   message: '',
 };
 
@@ -46,9 +46,9 @@ export function DepartmentsPage() {
   return (
     <div className="workspace reveal">
       <SectionHeader
-        eyebrow="Comunicacao operacional"
-        title="Alinhamentos entre departamentos sem perder historico"
-        description="O mural registra combinados, publico-alvo e impacto direto nas demandas em andamento."
+        eyebrow="Comunicação operacional"
+        title="Alinhamentos entre departamentos sem perder histórico"
+        description="O mural registra combinados, público-alvo e impacto direto nas demandas em andamento."
       />
 
       <div className="department-summary-grid">
@@ -80,7 +80,7 @@ export function DepartmentsPage() {
         <Panel>
           <SectionHeader
             eyebrow="Mural"
-            title="Atualizacoes publicadas"
+            title="Atualizações publicadas"
             description="Comunicados recentes exibem quem falou, para quem e qual contexto foi compartilhado."
           />
           <div className="feed">
@@ -98,7 +98,7 @@ export function DepartmentsPage() {
                     </div>
                     <div className="meta-row">
                       {department ? <DepartmentPill department={department} /> : null}
-                      <span>Publico: {update.audience}</span>
+                      <span>Público: {update.audience}</span>
                     </div>
                     <p>{update.message}</p>
                   </div>
@@ -112,7 +112,7 @@ export function DepartmentsPage() {
           <SectionHeader
             eyebrow="Novo alinhamento"
             title="Registrar mensagem operacional"
-            description="Use o formulario para simular a troca de contexto entre departamentos."
+            description="Use o formulário para simular a troca de contexto entre departamentos."
           />
 
           <form className="form-grid" onSubmit={handleSubmit}>
@@ -133,7 +133,7 @@ export function DepartmentsPage() {
             </label>
 
             <label>
-              Publico
+              Público
               <select
                 value={form.audience}
                 onChange={(event) =>
@@ -151,7 +151,7 @@ export function DepartmentsPage() {
               <input
                 value={form.author}
                 onChange={(event) => updateForm('author', event.target.value)}
-                placeholder="Quem esta publicando o alinhamento"
+                placeholder="Quem está publicando o alinhamento"
                 required
               />
             </label>
@@ -161,7 +161,7 @@ export function DepartmentsPage() {
               <textarea
                 value={form.message}
                 onChange={(event) => updateForm('message', event.target.value)}
-                placeholder="Ex.: Dependencia financeira liberada para o fechamento da sprint."
+                placeholder="Ex.: Dependência financeira liberada para o fechamento da sprint."
                 rows={5}
                 required
               />

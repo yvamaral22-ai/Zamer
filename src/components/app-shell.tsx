@@ -11,41 +11,41 @@ const navigationItems = [
   {
     href: '/',
     label: 'Painel',
-    description: 'Resumo da operacao',
+    description: 'Resumo da operação',
   },
   {
     href: '/solicitacoes',
-    label: 'Solicitacoes',
+    label: 'Solicitações',
     description: 'Entrada e rastreabilidade',
   },
   {
     href: '/tarefas',
     label: 'Tarefas',
-    description: 'Execucao por etapa',
+    description: 'Execução por etapa',
   },
   {
     href: '/departamentos',
     label: 'Departamentos',
-    description: 'Handoffs e comunicacao',
+    description: 'Transições e comunicação',
   },
 ];
 
 const pageContent: Record<string, { title: string; summary: string }> = {
   '/': {
-    title: 'Painel integrado da operacao',
-    summary: 'Fluxos, gargalos e historico operacional em um unico ambiente.',
+    title: 'Painel integrado da operação',
+    summary: 'Fluxos, gargalos e histórico operacional em um único ambiente.',
   },
   '/solicitacoes': {
-    title: 'Central de solicitacoes internas',
-    summary: 'Cadastre, acompanhe e evolua demandas com status e SLA visiveis.',
+    title: 'Central de solicitações internas',
+    summary: 'Cadastre, acompanhe e evolua demandas com status e SLA visíveis.',
   },
   '/tarefas': {
-    title: 'Quadro de execucao',
-    summary: 'Acompanhe a entrega entre areas com foco em bloqueios e proximos passos.',
+    title: 'Quadro de execução',
+    summary: 'Acompanhe a entrega entre áreas, com foco em bloqueios e próximos passos.',
   },
   '/departamentos': {
     title: 'Mural interdepartamental',
-    summary: 'Compartilhe alinhamentos, handoffs e combinados operacionais.',
+    summary: 'Compartilhe alinhamentos, transições e combinados operacionais.',
   },
 };
 
@@ -64,16 +64,16 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="shell">
       <aside className="shell__sidebar">
         <div className="brand-block">
-          <span className="brand-block__eyebrow">Projeto academico</span>
+          <span className="brand-block__eyebrow">Projeto acadêmico</span>
           <h1 className="brand-block__title">IntegraFlow</h1>
           <p className="brand-block__copy">
-            Sistema corporativo para consolidar solicitacoes, tarefas e comunicacao
+            Sistema corporativo para consolidar solicitações, tarefas e comunicação
             operacional.
           </p>
         </div>
 
         <div className="sidebar-section">
-          <p className="sidebar-label">Navegacao</p>
+          <p className="sidebar-label">Navegação</p>
           <nav className="navigation">
             {navigationItems.map((item) => {
               const active = pathname === item.href;
@@ -95,18 +95,18 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
 
         <div className="sidebar-section">
-          <p className="sidebar-label">Pulso da operacao</p>
+          <p className="sidebar-label">Pulso da operação</p>
           <div className="sidebar-stack">
             <div className="sidebar-tile">
-              <span>Solicitacoes abertas</span>
+              <span>Solicitações abertas</span>
               <strong>{openRequests}</strong>
             </div>
             <div className="sidebar-tile">
-              <span>Tasks bloqueadas</span>
+              <span>Tarefas bloqueadas</span>
               <strong>{blockedTasks}</strong>
             </div>
             <div className="sidebar-tile">
-              <span>Areas engajadas</span>
+              <span>Áreas engajadas</span>
               <strong>{engagedDepartments}</strong>
             </div>
           </div>
@@ -117,14 +117,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="shell__content">
           <header className="topbar">
             <div className="topbar__main">
-              <p className="eyebrow">Sprint 01 | Concepcao e prototipo</p>
+              <p className="eyebrow">Sprint 01 | Concepção e protótipo</p>
               <h2 className="topbar__title">{currentPage.title}</h2>
               <p className="topbar__summary">{currentPage.summary}</p>
             </div>
 
             <div className="topbar__meta">
-              <span>Stakeholders foco</span>
-              <strong>Diretoria, TI, RH, Financeiro e Operacoes</strong>
+              <span>Stakeholders em foco</span>
+              <strong>Diretoria, TI, RH, Financeiro e Operações</strong>
             </div>
           </header>
 

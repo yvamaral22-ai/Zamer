@@ -5,20 +5,20 @@ export type DepartmentId =
   | 'operacoes'
   | 'comercial';
 
-export type RequestPriority = 'Baixa' | 'Media' | 'Alta' | 'Critica';
+export type RequestPriority = 'Baixa' | 'Média' | 'Alta' | 'Crítica';
 
 export type RequestStatus =
   | 'Nova'
   | 'Triagem'
-  | 'Execucao'
-  | 'Validacao'
-  | 'Concluida';
+  | 'Execução'
+  | 'Validação'
+  | 'Concluída';
 
 export type TaskStatus =
   | 'Planejada'
   | 'Em progresso'
   | 'Bloqueada'
-  | 'Concluida';
+  | 'Concluída';
 
 export type UpdateAudience = 'Todos' | 'Gestores' | 'Operacional';
 export type CommentEntity = 'request' | 'task';
