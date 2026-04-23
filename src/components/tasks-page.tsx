@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 import { usePrototype } from '@/components/prototype-provider';
 import {
@@ -58,9 +58,6 @@ function TaskBoardCard({
   comments,
   department,
   isExpanded,
-  isPending,
-  onAddComment,
-  onMoveTask,
   onToggle,
   requestTitle,
   task,
@@ -68,33 +65,11 @@ function TaskBoardCard({
   comments: CommentItem[];
   department?: Department;
   isExpanded: boolean;
-  isPending: boolean;
-  onAddComment: (task: TaskItem, input: { author: string; message: string }) => void;
-  onMoveTask: (
-    task: TaskItem,
-    direction: 'back' | 'forward',
-    input?: { author: string; message: string },
-  ) => void;
   onToggle: () => void;
   requestTitle: string;
   task: TaskItem;
 }) {
-  const [commentForm, setCommentForm] = useState({
-    author: task.assignee,
-    message: '',
-  });
-
-  useEffect(() => {
-    setCommentForm({
-      author: task.assignee,
-      message: '',
-    });
-  }, [task.id, task.assignee]);
-
   const isRisk = task.status === 'Bloqueada' || isCriticalDeadline(task.dueAt);
-  const index = taskStatusOrder.indexOf(task.status as TaskStatus);
-  const nextStatus = taskStatusOrder[Math.min(index + 1, taskStatusOrder.length - 1)];
-  const hasCommentMessage = commentForm.message.trim().length > 0;
   const latestComment = comments[0];
   const commentCountLabel = `${comments.length} ${comments.length === 1 ? 'comentário' : 'comentários'}`;
   const previewLabel = task.blockedReason
@@ -117,7 +92,7 @@ function TaskBoardCard({
       className={[
         'task-card',
         isRisk ? 'task-card--risk' : '',
-        isExpanded ? 'task-card--expanded' : '',
+        isExpanded ? 'task-card--active' : '',
       ]
         .filter(Boolean)
         .join(' ')}
@@ -127,6 +102,7 @@ function TaskBoardCard({
         className="task-card__summary"
         onClick={onToggle}
         aria-expanded={isExpanded}
+        aria-controls={`task-inspector-${task.id}`}
       >
         <div className="task-card__summary-top">
           <div className="task-card__summary-main">
@@ -145,7 +121,7 @@ function TaskBoardCard({
           </div>
 
           <span className="task-card__toggle-indicator">
-            {isExpanded ? 'Recolher' : 'Abrir detalhes'}
+            {isExpanded ? 'Em foco' : 'Abrir detalhes'}
           </span>
         </div>
 
@@ -178,90 +154,184 @@ function TaskBoardCard({
           <span>{previewMeta}</span>
         </div>
       </div>
+    </article>
+  );
+}
 
-      {isExpanded ? (
-        <div className="task-card__expanded-panel">
-          <div className="task-card__detail-grid">
-            <div className="task-card__detail-item">
-              <span>Solicitação</span>
+function TaskBoardDetails({
+  comments,
+  department,
+  isPending,
+  onAddComment,
+  onClose,
+  onMoveTask,
+  requestTitle,
+  task,
+}: {
+  comments: CommentItem[];
+  department?: Department;
+  isPending: boolean;
+  onAddComment: (task: TaskItem, input: { author: string; message: string }) => void;
+  onClose: () => void;
+  onMoveTask: (
+    task: TaskItem,
+    direction: 'back' | 'forward',
+    input?: { author: string; message: string },
+  ) => void;
+  requestTitle: string;
+  task: TaskItem;
+}) {
+  const [commentForm, setCommentForm] = useState({
+    author: task.assignee,
+    message: '',
+  });
+
+  useEffect(() => {
+    setCommentForm({
+      author: task.assignee,
+      message: '',
+    });
+  }, [task.id, task.assignee]);
+
+  const isRisk = task.status === 'Bloqueada' || isCriticalDeadline(task.dueAt);
+  const index = taskStatusOrder.indexOf(task.status);
+  const nextStatus = taskStatusOrder[Math.min(index + 1, taskStatusOrder.length - 1)];
+  const latestComment = comments[0];
+  const hasCommentMessage = commentForm.message.trim().length > 0;
+  const detailMessage =
+    task.blockedReason ??
+    latestComment?.message ??
+    'Nenhum bloqueio foi registrado até aqui. Use o formulário ao lado para documentar o andamento antes de mover a tarefa.';
+
+  return (
+    <>
+      <SectionHeader
+        eyebrow="Tarefa em foco"
+        title={task.title}
+        description="Os detalhes ficam centralizados aqui para facilitar leitura, contexto e atualização da etapa."
+        action={
+          <GhostButton type="button" onClick={onClose}>
+            Fechar detalhes
+          </GhostButton>
+        }
+      />
+
+      <div className="task-inspector__layout">
+        <div className="task-inspector__content">
+          <div className="tag-row">
+            {department ? <DepartmentPill department={department} /> : null}
+            <StatusPill value={task.status} />
+            <span className="tag">Prazo {formatShortDate(task.dueAt)}</span>
+            <span className="tag">{relativeSlaText(task.dueAt)}</span>
+            <span className="tag">Esforço {task.effort}</span>
+          </div>
+
+          <p className={task.blockedReason ? 'task-card__warning' : 'panel-copy'}>
+            {detailMessage}
+          </p>
+
+          <div className="detail-grid">
+            <div className="detail-block">
+              <span className="detail-block__label">Solicitação vinculada</span>
               <strong>{requestTitle}</strong>
             </div>
-            <div className="task-card__detail-item">
-              <span>Responsável</span>
+            <div className="detail-block">
+              <span className="detail-block__label">Responsável</span>
               <strong>{task.assignee}</strong>
             </div>
-            <div className="task-card__detail-item">
-              <span>Prazo final</span>
+            <div className="detail-block">
+              <span className="detail-block__label">Prazo final</span>
               <strong>{formatShortDate(task.dueAt)}</strong>
             </div>
-            <div className="task-card__detail-item">
-              <span>Esforço estimado</span>
-              <strong>{task.effort}</strong>
+            <div className="detail-block">
+              <span className="detail-block__label">Situação</span>
+              <strong>{isRisk ? 'Exige atenção' : 'Acompanhamento estável'}</strong>
             </div>
           </div>
 
-          <div className="task-card__comment-stack">
-            <label className="task-card__field">
-              Autor do comentário
-              <input
-                value={commentForm.author}
-                onChange={(event) =>
-                  setCommentForm((current) => ({
-                    ...current,
-                    author: event.target.value,
-                  }))
-                }
-                placeholder="Quem está atualizando a tarefa"
-              />
-            </label>
+          <div className="detail-stack">
+            <SectionHeader
+              eyebrow="Histórico"
+              title="Últimos registros da tarefa"
+              description="Comentários recentes ajudam a entender a transição da etapa sem abrir outros painéis."
+            />
 
-            <label className="task-card__field">
-              Contexto da etapa
-              <textarea
-                value={commentForm.message}
-                onChange={(event) =>
-                  setCommentForm((current) => ({
-                    ...current,
-                    message: event.target.value,
-                  }))
-                }
-                placeholder="Ex.: Implementação em andamento, testes iniciados e dependência externa ainda pendente."
-                rows={3}
-              />
-            </label>
-          </div>
-
-          {comments.length > 0 ? (
-            <div className="task-card__history">
-              {comments.slice(0, 2).map((comment) => (
-                <article className="feed-item" key={comment.id}>
-                  <div className="feed-item__content">
-                    <div className="feed-item__header">
-                      <strong>{comment.author}</strong>
-                      <span>{formatDateTime(comment.createdAt)}</span>
+            {comments.length > 0 ? (
+              <div className="feed">
+                {comments.slice(0, 3).map((comment) => (
+                  <article className="feed-item" key={comment.id}>
+                    <div className="feed-item__content">
+                      <div className="feed-item__header">
+                        <strong>{comment.author}</strong>
+                        <span>{formatDateTime(comment.createdAt)}</span>
+                      </div>
+                      <p>{comment.message}</p>
                     </div>
-                    <p>{comment.message}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          ) : null}
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <p className="empty-state">Nenhum comentário foi registrado nesta tarefa.</p>
+            )}
+          </div>
+        </div>
 
-          <div className="task-card__actions">
-            <GhostButton
-              type="button"
-              disabled={isPending || !hasCommentMessage}
-              onClick={() => {
-                onAddComment(task, {
-                  author: commentForm.author.trim() || task.assignee,
-                  message: commentForm.message.trim(),
-                });
+        <form
+          className="task-inspector__form"
+          onSubmit={(event) => {
+            event.preventDefault();
+
+            if (!hasCommentMessage) {
+              return;
+            }
+
+            onAddComment(task, {
+              author: commentForm.author.trim() || task.assignee,
+              message: commentForm.message.trim(),
+            });
+            setCommentForm((current) => ({
+              ...current,
+              message: '',
+            }));
+          }}
+        >
+          <SectionHeader
+            eyebrow="Atualização"
+            title="Registrar contexto da etapa"
+            description="Comente o andamento e use os controles abaixo para avançar, concluir ou retornar a tarefa."
+          />
+
+          <label className="task-card__field">
+            Autor do comentário
+            <input
+              value={commentForm.author}
+              onChange={(event) =>
                 setCommentForm((current) => ({
                   ...current,
-                  message: '',
-                }));
-              }}
-            >
+                  author: event.target.value,
+                }))
+              }
+              placeholder="Quem está atualizando a tarefa"
+            />
+          </label>
+
+          <label className="task-card__field">
+            Contexto da etapa
+            <textarea
+              value={commentForm.message}
+              onChange={(event) =>
+                setCommentForm((current) => ({
+                  ...current,
+                  message: event.target.value,
+                }))
+              }
+              placeholder="Ex.: Implementação em andamento, testes iniciados e dependência externa ainda pendente."
+              rows={5}
+            />
+          </label>
+
+          <div className="task-card__actions">
+            <GhostButton type="submit" disabled={isPending || !hasCommentMessage}>
               Registrar comentário
             </GhostButton>
 
@@ -290,9 +360,9 @@ function TaskBoardCard({
               {nextStatus === 'Concluída' ? 'Concluir com contexto' : 'Avançar com contexto'}
             </AccentButton>
           </div>
-        </div>
-      ) : null}
-    </article>
+        </form>
+      </div>
+    </>
   );
 }
 
@@ -301,11 +371,13 @@ export function TasksPage() {
   const [departmentFilter, setDepartmentFilter] = useState<DepartmentFilter>('Todas');
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const inspectorRef = useRef<HTMLDivElement | null>(null);
 
   const visibleTasks =
     departmentFilter === 'Todas'
       ? tasks
       : tasks.filter((task) => task.departmentId === departmentFilter);
+
   const departmentsById = new Map(departments.map((department) => [department.id, department]));
   const requestsById = new Map(requests.map((request) => [request.id, request]));
   const taskCommentsById = comments.reduce((map, comment) => {
@@ -324,6 +396,17 @@ export function TasksPage() {
     (task) => task.status !== 'Concluída' && isCriticalDeadline(task.dueAt),
   ).length;
 
+  const selectedTask = expandedTaskId
+    ? visibleTasks.find((task) => task.id === expandedTaskId) ?? null
+    : null;
+  const selectedDepartment = selectedTask
+    ? departmentsById.get(selectedTask.departmentId)
+    : undefined;
+  const selectedRequest = selectedTask
+    ? requestsById.get(selectedTask.requestId)
+    : undefined;
+  const selectedComments = selectedTask ? taskCommentsById.get(selectedTask.id) ?? [] : [];
+
   useEffect(() => {
     if (!expandedTaskId) {
       return;
@@ -335,6 +418,17 @@ export function TasksPage() {
       setExpandedTaskId(null);
     }
   }, [expandedTaskId, visibleTasks]);
+
+  useEffect(() => {
+    if (!selectedTask) {
+      return;
+    }
+
+    inspectorRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  }, [selectedTask?.id]);
 
   function handleAddTaskComment(
     task: TaskItem,
@@ -366,7 +460,7 @@ export function TasksPage() {
       <SectionHeader
         eyebrow="Execução rastreável"
         title="Quadro de tarefas por etapa"
-        description="Cada card agora aceita comentário de andamento antes de avançar ou concluir a execução."
+        description="Clique em uma tarefa para abrir os detalhes em um painel dedicado, com contexto, histórico e ações da etapa."
         action={
           <select
             className="select-inline"
@@ -401,6 +495,31 @@ export function TasksPage() {
         </div>
       </div>
 
+      <div ref={inspectorRef} id={selectedTask ? `task-inspector-${selectedTask.id}` : undefined}>
+        {selectedTask ? (
+          <Panel className="task-inspector">
+            <TaskBoardDetails
+              comments={selectedComments}
+              department={selectedDepartment}
+              isPending={isPending}
+              onAddComment={handleAddTaskComment}
+              onClose={() => setExpandedTaskId(null)}
+              onMoveTask={handleMoveTask}
+              requestTitle={selectedRequest?.title ?? 'Solicitação vinculada'}
+              task={selectedTask}
+            />
+          </Panel>
+        ) : (
+          <Panel className="task-inspector task-inspector--empty">
+            <SectionHeader
+              eyebrow="Detalhamento"
+              title="Selecione uma tarefa do quadro"
+              description="Use o botão “Abrir detalhes” em qualquer card para visualizar informações completas, histórico e ações da etapa."
+            />
+          </Panel>
+        )}
+      </div>
+
       <div className="board">
         {taskStatusOrder.map((status) => {
           const columnTasks = visibleTasks.filter((task) => task.status === status);
@@ -433,10 +552,7 @@ export function TasksPage() {
                       comments={taskComments}
                       department={department}
                       isExpanded={expandedTaskId === task.id}
-                      isPending={isPending}
                       key={task.id}
-                      onAddComment={handleAddTaskComment}
-                      onMoveTask={handleMoveTask}
                       onToggle={() =>
                         setExpandedTaskId((current) => (current === task.id ? null : task.id))
                       }
