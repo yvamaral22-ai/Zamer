@@ -14,6 +14,7 @@ import {
 import {
   formatDateTime,
   formatShortDate,
+  initials,
   isCriticalDeadline,
   relativeSlaText,
 } from '@/lib/formatters';
@@ -22,17 +23,51 @@ import type { CommentItem, Department, DepartmentId, TaskItem, TaskStatus } from
 
 type DepartmentFilter = DepartmentId | 'Todas';
 
+const boardStatusClass: Record<TaskStatus, string> = {
+  Planejada: 'board__column--planned',
+  'Em progresso': 'board__column--progress',
+  Bloqueada: 'board__column--blocked',
+  Concluida: 'board__column--done',
+};
+
+function taskCountLabel(count: number) {
+  return `${count} ${count === 1 ? 'task' : 'tasks'}`;
+}
+
+function columnSummary(status: TaskStatus, count: number, atRiskCount: number) {
+  if (count === 0) {
+    return 'Sem movimentacao nesta etapa.';
+  }
+
+  if (status === 'Concluida') {
+    return `${taskCountLabel(count)} com contexto final registrado.`;
+  }
+
+  if (status === 'Bloqueada') {
+    return `${taskCountLabel(count)} aguardando destravamento.`;
+  }
+
+  if (atRiskCount > 0) {
+    return `${atRiskCount} exigem atencao imediata de prazo.`;
+  }
+
+  return `${taskCountLabel(count)} distribuidas com acompanhamento ativo.`;
+}
+
 function TaskBoardCard({
   comments,
   department,
+  isExpanded,
   isPending,
   onAddComment,
   onMoveTask,
+  onToggle,
   requestTitle,
   task,
 }: {
   comments: CommentItem[];
   department?: Department;
+  isExpanded: boolean;
   isPending: boolean;
   onAddComment: (task: TaskItem, input: { author: string; message: string }) => void;
   onMoveTask: (
@@ -40,6 +75,7 @@ function TaskBoardCard({
     direction: 'back' | 'forward',
     input?: { author: string; message: string },
   ) => void;
+  onToggle: () => void;
   requestTitle: string;
   task: TaskItem;
 }) {
@@ -59,118 +95,203 @@ function TaskBoardCard({
   const index = taskStatusOrder.indexOf(task.status as TaskStatus);
   const nextStatus = taskStatusOrder[Math.min(index + 1, taskStatusOrder.length - 1)];
   const hasCommentMessage = commentForm.message.trim().length > 0;
+  const latestComment = comments[0];
+  const commentCountLabel = `${comments.length} ${comments.length === 1 ? 'comentario' : 'comentarios'}`;
+  const previewLabel = task.blockedReason
+    ? 'Bloqueio ativo'
+    : latestComment
+      ? `Ultimo contexto por ${latestComment.author}`
+      : isRisk
+        ? 'Task em atencao imediata'
+        : 'Task pronta para atualizacao';
+  const previewMeta = latestComment
+    ? formatDateTime(latestComment.createdAt)
+    : `Prazo ${formatShortDate(task.dueAt)}`;
+  const previewText =
+    task.blockedReason ??
+    latestComment?.message ??
+    'Abra os detalhes para registrar contexto, comentar a execucao e mover a task com mais clareza.';
 
   return (
-    <article className={isRisk ? 'task-card task-card--risk' : 'task-card'}>
-      <div className="task-card__header">
-        <strong>{task.title}</strong>
-        <StatusPill value={task.status} />
+    <article
+      className={[
+        'task-card',
+        isRisk ? 'task-card--risk' : '',
+        isExpanded ? 'task-card--expanded' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <button
+        type="button"
+        className="task-card__summary"
+        onClick={onToggle}
+        aria-expanded={isExpanded}
+      >
+        <div className="task-card__summary-top">
+          <div className="task-card__summary-main">
+            <div className="task-card__summary-tags">
+              {department ? <DepartmentPill department={department} /> : null}
+              <span className="task-card__owner">
+                <span className="task-card__avatar">{initials(task.assignee)}</span>
+                {task.assignee}
+              </span>
+            </div>
+
+            <div className="task-card__header">
+              <strong>{task.title}</strong>
+              <StatusPill value={task.status} />
+            </div>
+          </div>
+
+          <span className="task-card__toggle-indicator">
+            {isExpanded ? 'Recolher' : 'Abrir detalhes'}
+          </span>
+        </div>
+
+        <p className="task-card__request-title">{requestTitle}</p>
+
+        <div className="task-card__meta-grid">
+          <span className="task-card__meta-chip">Prazo {formatShortDate(task.dueAt)}</span>
+          <span
+            className={[
+              'task-card__meta-chip',
+              isRisk ? 'task-card__meta-chip--risk' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {relativeSlaText(task.dueAt)}
+          </span>
+          <span className="task-card__meta-chip">Esforco {task.effort}</span>
+          <span className="task-card__meta-chip">{commentCountLabel}</span>
+        </div>
+      </button>
+
+      <div className="task-card__preview">
+        <p className={task.blockedReason ? 'task-card__warning' : 'task-card__preview-copy'}>
+          {previewText}
+        </p>
+
+        <div className="task-card__preview-footer">
+          <span>{previewLabel}</span>
+          <span>{previewMeta}</span>
+        </div>
       </div>
 
-      <p>{requestTitle}</p>
+      {isExpanded ? (
+        <div className="task-card__expanded-panel">
+          <div className="task-card__detail-grid">
+            <div className="task-card__detail-item">
+              <span>Solicitacao</span>
+              <strong>{requestTitle}</strong>
+            </div>
+            <div className="task-card__detail-item">
+              <span>Responsavel</span>
+              <strong>{task.assignee}</strong>
+            </div>
+            <div className="task-card__detail-item">
+              <span>Prazo final</span>
+              <strong>{formatShortDate(task.dueAt)}</strong>
+            </div>
+            <div className="task-card__detail-item">
+              <span>Esforco estimado</span>
+              <strong>{task.effort}</strong>
+            </div>
+          </div>
 
-      <div className="meta-row">
-        {department ? <DepartmentPill department={department} /> : null}
-        <span>{task.assignee}</span>
-      </div>
+          <div className="task-card__comment-stack">
+            <label className="task-card__field">
+              Autor do comentario
+              <input
+                value={commentForm.author}
+                onChange={(event) =>
+                  setCommentForm((current) => ({
+                    ...current,
+                    author: event.target.value,
+                  }))
+                }
+                placeholder="Quem esta atualizando a task"
+              />
+            </label>
 
-      <div className="meta-row">
-        <span>Prazo {formatShortDate(task.dueAt)}</span>
-        <span>{relativeSlaText(task.dueAt)}</span>
-      </div>
+            <label className="task-card__field">
+              Contexto da etapa
+              <textarea
+                value={commentForm.message}
+                onChange={(event) =>
+                  setCommentForm((current) => ({
+                    ...current,
+                    message: event.target.value,
+                  }))
+                }
+                placeholder="Ex.: Implementacao em andamento, testes iniciados e dependencia externa ainda pendente."
+                rows={3}
+              />
+            </label>
+          </div>
 
-      {task.blockedReason ? <p className="task-card__warning">{task.blockedReason}</p> : null}
+          {comments.length > 0 ? (
+            <div className="task-card__history">
+              {comments.slice(0, 2).map((comment) => (
+                <article className="feed-item" key={comment.id}>
+                  <div className="feed-item__content">
+                    <div className="feed-item__header">
+                      <strong>{comment.author}</strong>
+                      <span>{formatDateTime(comment.createdAt)}</span>
+                    </div>
+                    <p>{comment.message}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
 
-      <div className="task-card__comment-stack">
-        <label className="task-card__field">
-          Autor do comentario
-          <input
-            value={commentForm.author}
-            onChange={(event) =>
-              setCommentForm((current) => ({
-                ...current,
-                author: event.target.value,
-              }))
-            }
-            placeholder="Quem esta atualizando a task"
-          />
-        </label>
+          <div className="task-card__actions">
+            <GhostButton
+              type="button"
+              disabled={isPending || !hasCommentMessage}
+              onClick={() => {
+                onAddComment(task, {
+                  author: commentForm.author.trim() || task.assignee,
+                  message: commentForm.message.trim(),
+                });
+                setCommentForm((current) => ({
+                  ...current,
+                  message: '',
+                }));
+              }}
+            >
+              Registrar comentario
+            </GhostButton>
 
-        <label className="task-card__field">
-          Contexto da etapa
-          <textarea
-            value={commentForm.message}
-            onChange={(event) =>
-              setCommentForm((current) => ({
-                ...current,
-                message: event.target.value,
-              }))
-            }
-            placeholder="Ex.: Implementacao em andamento, testes iniciados e dependencia externa ainda pendente."
-            rows={3}
-          />
-        </label>
-      </div>
+            <GhostButton
+              type="button"
+              disabled={isPending || index === 0}
+              onClick={() => onMoveTask(task, 'back')}
+            >
+              Voltar
+            </GhostButton>
 
-      {comments.length > 0 ? (
-        <div className="task-card__history">
-          {comments.slice(0, 2).map((comment) => (
-            <article className="feed-item" key={comment.id}>
-              <div className="feed-item__content">
-                <div className="feed-item__header">
-                  <strong>{comment.author}</strong>
-                  <span>{formatDateTime(comment.createdAt)}</span>
-                </div>
-                <p>{comment.message}</p>
-              </div>
-            </article>
-          ))}
+            <AccentButton
+              type="button"
+              disabled={isPending || index === taskStatusOrder.length - 1 || !hasCommentMessage}
+              onClick={() => {
+                onMoveTask(task, 'forward', {
+                  author: commentForm.author.trim() || task.assignee,
+                  message: commentForm.message.trim(),
+                });
+                setCommentForm((current) => ({
+                  ...current,
+                  message: '',
+                }));
+              }}
+            >
+              {nextStatus === 'Concluida' ? 'Concluir com contexto' : 'Avancar com contexto'}
+            </AccentButton>
+          </div>
         </div>
       ) : null}
-
-      <div className="task-card__actions">
-        <GhostButton
-          type="button"
-          disabled={isPending || !hasCommentMessage}
-          onClick={() => {
-            onAddComment(task, {
-              author: commentForm.author.trim() || task.assignee,
-              message: commentForm.message.trim(),
-            });
-            setCommentForm((current) => ({
-              ...current,
-              message: '',
-            }));
-          }}
-        >
-          Registrar comentario
-        </GhostButton>
-
-        <GhostButton
-          type="button"
-          disabled={isPending || index === 0}
-          onClick={() => onMoveTask(task, 'back')}
-        >
-          Voltar
-        </GhostButton>
-
-        <AccentButton
-          type="button"
-          disabled={isPending || index === taskStatusOrder.length - 1 || !hasCommentMessage}
-          onClick={() => {
-            onMoveTask(task, 'forward', {
-              author: commentForm.author.trim() || task.assignee,
-              message: commentForm.message.trim(),
-            });
-            setCommentForm((current) => ({
-              ...current,
-              message: '',
-            }));
-          }}
-        >
-          {nextStatus === 'Concluida' ? 'Concluir com contexto' : 'Avancar com contexto'}
-        </AccentButton>
-      </div>
     </article>
   );
 }
@@ -178,17 +299,42 @@ function TaskBoardCard({
 export function TasksPage() {
   const { addComment, comments, departments, moveTask, requests, tasks } = usePrototype();
   const [departmentFilter, setDepartmentFilter] = useState<DepartmentFilter>('Todas');
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const visibleTasks =
     departmentFilter === 'Todas'
       ? tasks
       : tasks.filter((task) => task.departmentId === departmentFilter);
+  const departmentsById = new Map(departments.map((department) => [department.id, department]));
+  const requestsById = new Map(requests.map((request) => [request.id, request]));
+  const taskCommentsById = comments.reduce((map, comment) => {
+    if (comment.entityType !== 'task') {
+      return map;
+    }
+
+    const currentComments = map.get(comment.entityId) ?? [];
+    currentComments.push(comment);
+    map.set(comment.entityId, currentComments);
+    return map;
+  }, new Map<string, CommentItem[]>());
 
   const blockedTasks = visibleTasks.filter((task) => task.status === 'Bloqueada').length;
   const tasksNearDeadline = visibleTasks.filter(
     (task) => task.status !== 'Concluida' && isCriticalDeadline(task.dueAt),
   ).length;
+
+  useEffect(() => {
+    if (!expandedTaskId) {
+      return;
+    }
+
+    const taskIsVisible = visibleTasks.some((task) => task.id === expandedTaskId);
+
+    if (!taskIsVisible) {
+      setExpandedTaskId(null);
+    }
+  }, [expandedTaskId, visibleTasks]);
 
   function handleAddTaskComment(
     task: TaskItem,
@@ -258,36 +404,42 @@ export function TasksPage() {
       <div className="board">
         {taskStatusOrder.map((status) => {
           const columnTasks = visibleTasks.filter((task) => task.status === status);
+          const atRiskTasks = columnTasks.filter(
+            (task) => task.status === 'Bloqueada' || isCriticalDeadline(task.dueAt),
+          ).length;
 
           return (
-            <Panel className="board__column" key={status}>
+            <Panel className={`board__column ${boardStatusClass[status]}`} key={status}>
               <div className="board__column-header">
-                <div>
+                <div className="board__column-copy">
                   <span className="eyebrow">Etapa</span>
                   <h3>{status}</h3>
+                  <p>{columnSummary(status, columnTasks.length, atRiskTasks)}</p>
                 </div>
-                <strong>{columnTasks.length}</strong>
+                <div className="board__column-badge">
+                  <strong>{columnTasks.length}</strong>
+                  <span>{taskCountLabel(columnTasks.length)}</span>
+                </div>
               </div>
 
               <div className="board__stack">
                 {columnTasks.map((task) => {
-                  const department = departments.find(
-                    (departmentItem) => departmentItem.id === task.departmentId,
-                  );
-                  const request = requests.find((requestItem) => requestItem.id === task.requestId);
-                  const taskComments = comments.filter(
-                    (comment) =>
-                      comment.entityType === 'task' && comment.entityId === task.id,
-                  );
+                  const department = departmentsById.get(task.departmentId);
+                  const request = requestsById.get(task.requestId);
+                  const taskComments = taskCommentsById.get(task.id) ?? [];
 
                   return (
                     <TaskBoardCard
                       comments={taskComments}
                       department={department}
+                      isExpanded={expandedTaskId === task.id}
                       isPending={isPending}
                       key={task.id}
                       onAddComment={handleAddTaskComment}
                       onMoveTask={handleMoveTask}
+                      onToggle={() =>
+                        setExpandedTaskId((current) => (current === task.id ? null : task.id))
+                      }
                       requestTitle={request?.title ?? 'Solicitacao vinculada'}
                       task={task}
                     />
@@ -295,7 +447,10 @@ export function TasksPage() {
                 })}
 
                 {columnTasks.length === 0 ? (
-                  <p className="empty-state">Nenhuma task nesta etapa.</p>
+                  <div className="empty-state empty-state--board">
+                    <strong>Quadro limpo</strong>
+                    <span>Nenhuma task precisa de acompanhamento nesta etapa.</span>
+                  </div>
                 ) : null}
               </div>
             </Panel>
