@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
 
 import type {
   Department,
@@ -73,17 +73,43 @@ export function MetricCard({
   value,
   note,
   className,
+  isActive,
+  ...buttonProps
 }: {
   label: string;
   value: string;
   note: string;
   className?: string;
-}) {
-  return (
-    <div className={joinClasses('metric-card', className)}>
+  isActive?: boolean;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+  const content = (
+    <>
       <span className="metric-card__label">{label}</span>
       <strong className="metric-card__value">{value}</strong>
       <span className="metric-card__note">{note}</span>
+    </>
+  );
+
+  if (buttonProps.onClick) {
+    return (
+      <button
+        {...buttonProps}
+        type={buttonProps.type ?? 'button'}
+        className={joinClasses(
+          'metric-card',
+          'metric-card--interactive',
+          isActive ? 'metric-card--active' : '',
+          className,
+        )}
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <div className={joinClasses('metric-card', className)}>
+      {content}
     </div>
   );
 }

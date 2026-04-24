@@ -27,7 +27,7 @@ import type {
   UpdateRequestInput,
 } from '@/lib/types';
 
-type RequestFilter = RequestStatus | 'Todas';
+type RequestFilter = RequestStatus | 'Todas' | 'Abertas' | 'Prioritarias';
 
 const initialForm: NewRequestInput = {
   title: '',
@@ -116,7 +116,16 @@ export function RequestsPage() {
   }, new Map<string, number>());
 
   const filteredRequests = requests.filter((request) => {
-    const matchesStatus = statusFilter === 'Todas' || request.status === statusFilter;
+    const isPriorityRequest =
+      isOpenRequest(request.status) &&
+      (request.priority === 'Alta' ||
+        request.priority === 'Crítica' ||
+        isCriticalDeadline(request.dueAt));
+    const matchesStatus =
+      statusFilter === 'Todas' ||
+      (statusFilter === 'Abertas' && isOpenRequest(request.status)) ||
+      (statusFilter === 'Prioritarias' && isPriorityRequest) ||
+      request.status === statusFilter;
     const normalizedQuery = deferredQuery.trim().toLowerCase();
     const matchesQuery =
       normalizedQuery.length === 0 ||
@@ -277,42 +286,63 @@ export function RequestsPage() {
           label="Total de solicitações"
           value={String(totalRequests)}
           note="Visão consolidada da fila"
+          isActive={statusFilter === 'Todas'}
+          aria-pressed={statusFilter === 'Todas'}
+          onClick={() => setStatusFilter('Todas')}
         />
         <MetricCard
           className="metric-card--flat metric-card--green"
           label="Solicitações abertas"
           value={String(openRequests)}
           note="Demandas ainda em andamento"
+          isActive={statusFilter === 'Abertas'}
+          aria-pressed={statusFilter === 'Abertas'}
+          onClick={() => setStatusFilter('Abertas')}
         />
         <MetricCard
           className="metric-card--flat metric-card--rose"
           label="Em triagem"
           value={String(triageRequests)}
           note="Itens aguardando direcionamento"
+          isActive={statusFilter === 'Triagem'}
+          aria-pressed={statusFilter === 'Triagem'}
+          onClick={() => setStatusFilter('Triagem')}
         />
         <MetricCard
           className="metric-card--flat metric-card--red"
           label="Em execução"
           value={String(executionRequests)}
           note="Demandas com atendimento ativo"
+          isActive={statusFilter === 'Execução'}
+          aria-pressed={statusFilter === 'Execução'}
+          onClick={() => setStatusFilter('Execução')}
         />
         <MetricCard
           className="metric-card--flat metric-card--orange"
           label="Fila prioritária"
           value={String(urgentRequests)}
           note="Alta prioridade ou prazo curto"
+          isActive={statusFilter === 'Prioritarias'}
+          aria-pressed={statusFilter === 'Prioritarias'}
+          onClick={() => setStatusFilter('Prioritarias')}
         />
         <MetricCard
           className="metric-card--flat metric-card--blue"
           label="Em validação"
           value={String(validationRequests)}
           note="Aguardando aceite final"
+          isActive={statusFilter === 'Validação'}
+          aria-pressed={statusFilter === 'Validação'}
+          onClick={() => setStatusFilter('Validação')}
         />
         <MetricCard
           className="metric-card--flat metric-card--stone"
           label="Concluídas"
           value={String(completedRequests)}
           note="Fluxos encerrados"
+          isActive={statusFilter === 'Concluída'}
+          aria-pressed={statusFilter === 'Concluída'}
+          onClick={() => setStatusFilter('Concluída')}
         />
       </div>
 
@@ -346,9 +376,11 @@ export function RequestsPage() {
             onChange={(event) => setStatusFilter(event.target.value as RequestFilter)}
           >
             <option value="Todas">Todas</option>
+            <option value="Abertas">Solicitações abertas</option>
             <option value="Nova">Nova</option>
             <option value="Triagem">Triagem</option>
             <option value="Execução">Execução</option>
+            <option value="Prioritarias">Fila prioritária</option>
             <option value="Validação">Validação</option>
             <option value="Concluída">Concluída</option>
           </select>
