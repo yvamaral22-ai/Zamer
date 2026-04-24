@@ -1,0 +1,159 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2200" height="1450" viewBox="0 0 2200 1450">
+  <defs>
+    <style>
+      .bg { fill: #eef4f8; }
+      .title { fill: #073154; font-family: Arial, sans-serif; font-size: 44px; font-weight: 700; text-anchor: middle; }
+      .class-box { fill: #ffffff; stroke: #155f95; stroke-width: 3; }
+      .class-header { fill: #dff0fb; stroke: #155f95; stroke-width: 3; }
+      .class-title { fill: #05243d; font-family: Arial, sans-serif; font-size: 27px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .class-text { fill: #05243d; font-family: Arial, sans-serif; font-size: 20px; }
+      .separator { stroke: #155f95; stroke-width: 2; }
+      .rel { stroke: #344b5b; stroke-width: 2.6; fill: none; marker-end: url(#arrow); }
+      .comp { stroke: #344b5b; stroke-width: 2.8; fill: none; marker-start: url(#diamond); }
+      .mult { fill: #05243d; font-family: Arial, sans-serif; font-size: 20px; font-weight: 700; }
+      .rel-label { fill: #526879; font-family: Arial, sans-serif; font-size: 18px; font-weight: 700; }
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,2 L10,6 L2,10" fill="none" stroke="#344b5b" stroke-width="2"/>
+    </marker>
+    <marker id="diamond" markerWidth="18" markerHeight="14" refX="2" refY="7" orient="auto" markerUnits="strokeWidth">
+      <path d="M2,7 L8,2 L14,7 L8,12 Z" fill="#ffffff" stroke="#344b5b" stroke-width="2"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="2200" height="1450"/>
+  <text class="title" x="1100" y="70">Diagrama de Classes - Sistema de Gestão de Processos Digitais</text>
+
+  <!-- Usuario -->
+  <g transform="translate(120 150)">
+    <rect class="class-box" width="420" height="285" rx="12"/>
+    <rect class="class-header" width="420" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="420" y2="58"/>
+    <line class="separator" x1="0" y1="164" x2="420" y2="164"/>
+    <text class="class-title" x="210" y="31">Usuario</text>
+    <text class="class-text" x="24" y="92">- id</text>
+    <text class="class-text" x="24" y="120">- nome</text>
+    <text class="class-text" x="24" y="148">- email, perfil, departamento</text>
+    <text class="class-text" x="24" y="198">+ autenticar()</text>
+    <text class="class-text" x="24" y="226">+ consultarSolicitacoes()</text>
+    <text class="class-text" x="24" y="254">+ registrarComentario()</text>
+  </g>
+
+  <!-- Departamento -->
+  <g transform="translate(120 595)">
+    <rect class="class-box" width="420" height="245" rx="12"/>
+    <rect class="class-header" width="420" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="420" y2="58"/>
+    <line class="separator" x1="0" y1="146" x2="420" y2="146"/>
+    <text class="class-title" x="210" y="31">Departamento</text>
+    <text class="class-text" x="24" y="92">- id, nome</text>
+    <text class="class-text" x="24" y="120">- responsavel, capacidade</text>
+    <text class="class-text" x="24" y="180">+ acompanharDemandas()</text>
+    <text class="class-text" x="24" y="208">+ publicarAlinhamento()</text>
+  </g>
+
+  <!-- Solicitacao -->
+  <g transform="translate(760 260)">
+    <rect class="class-box" width="520" height="355" rx="12"/>
+    <rect class="class-header" width="520" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="520" y2="58"/>
+    <line class="separator" x1="0" y1="222" x2="520" y2="222"/>
+    <text class="class-title" x="260" y="31">Solicitacao</text>
+    <text class="class-text" x="24" y="92">- id, titulo, descricao</text>
+    <text class="class-text" x="24" y="120">- solicitante, prioridade, status</text>
+    <text class="class-text" x="24" y="148">- prazo, dataAbertura</text>
+    <text class="class-text" x="24" y="176">- responsavel, departamento</text>
+    <text class="class-text" x="24" y="256">+ cadastrar(), editar()</text>
+    <text class="class-text" x="24" y="284">+ consultar(), filtrar()</text>
+    <text class="class-text" x="24" y="312">+ avancarStatus(), concluir()</text>
+  </g>
+
+  <!-- Tarefa -->
+  <g transform="translate(1500 170)">
+    <rect class="class-box" width="470" height="305" rx="12"/>
+    <rect class="class-header" width="470" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="470" y2="58"/>
+    <line class="separator" x1="0" y1="176" x2="470" y2="176"/>
+    <text class="class-title" x="235" y="31">Tarefa</text>
+    <text class="class-text" x="24" y="92">- id, titulo, descricao</text>
+    <text class="class-text" x="24" y="120">- status, prazo, responsavel</text>
+    <text class="class-text" x="24" y="148">- solicitacao, departamento</text>
+    <text class="class-text" x="24" y="210">+ criar(), atualizarStatus()</text>
+    <text class="class-text" x="24" y="238">+ concluir(), bloquear()</text>
+    <text class="class-text" x="24" y="266">+ consultar()</text>
+  </g>
+
+  <!-- Comentario -->
+  <g transform="translate(1500 660)">
+    <rect class="class-box" width="470" height="260" rx="12"/>
+    <rect class="class-header" width="470" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="470" y2="58"/>
+    <line class="separator" x1="0" y1="160" x2="470" y2="160"/>
+    <text class="class-title" x="235" y="31">Comentario</text>
+    <text class="class-text" x="24" y="92">- id, autor, mensagem</text>
+    <text class="class-text" x="24" y="120">- dataCriacao</text>
+    <text class="class-text" x="24" y="148">- solicitacao, tarefa</text>
+    <text class="class-text" x="24" y="194">+ registrar()</text>
+    <text class="class-text" x="24" y="222">+ consultarHistorico()</text>
+  </g>
+
+  <!-- Indicador -->
+  <g transform="translate(760 990)">
+    <rect class="class-box" width="520" height="270" rx="12"/>
+    <rect class="class-header" width="520" height="58" rx="12"/>
+    <line class="separator" x1="0" y1="58" x2="520" y2="58"/>
+    <line class="separator" x1="0" y1="166" x2="520" y2="166"/>
+    <text class="class-title" x="260" y="31">Indicador</text>
+    <text class="class-text" x="24" y="92">- totalSolicitacoes</text>
+    <text class="class-text" x="24" y="120">- tarefasBloqueadas, leadTimeMedio</text>
+    <text class="class-text" x="24" y="148">- demandasPorDepartamento</text>
+    <text class="class-text" x="24" y="200">+ calcularIndicadores()</text>
+    <text class="class-text" x="24" y="228">+ exibirPainel(), atualizarMetricas()</text>
+  </g>
+
+  <!-- Relationships -->
+  <path class="rel" d="M540 295 H760"/>
+  <text class="mult" x="555" y="280">1</text>
+  <text class="mult" x="705" y="280">0..*</text>
+  <text class="rel-label" x="612" y="322">abre</text>
+
+  <path class="rel" d="M540 690 H650 V515 H760"/>
+  <text class="mult" x="555" y="675">1</text>
+  <text class="mult" x="705" y="528">0..*</text>
+  <text class="rel-label" x="612" y="668">possui</text>
+
+  <path class="rel" d="M330 595 V435"/>
+  <text class="mult" x="345" y="580">1</text>
+  <text class="mult" x="345" y="455">0..*</text>
+  <text class="rel-label" x="355" y="520">aloca</text>
+
+  <path class="comp" d="M1280 380 H1500"/>
+  <text class="mult" x="1300" y="365">1</text>
+  <text class="mult" x="1438" y="365">0..*</text>
+  <text class="rel-label" x="1360" y="408">compõe</text>
+
+  <path class="comp" d="M1280 540 H1390 V740 H1500"/>
+  <text class="mult" x="1300" y="525">1</text>
+  <text class="mult" x="1438" y="725">0..*</text>
+  <text class="rel-label" x="1408" y="650">registra</text>
+
+  <path class="rel" d="M1735 475 V660"/>
+  <text class="mult" x="1750" y="500">1</text>
+  <text class="mult" x="1750" y="640">0..*</text>
+  <text class="rel-label" x="1768" y="570">comenta</text>
+
+  <path class="rel" d="M540 360 H650 V790 H1500"/>
+  <text class="mult" x="555" y="345">1</text>
+  <text class="mult" x="1438" y="775">0..*</text>
+  <text class="rel-label" x="665" y="770">autor</text>
+
+  <path class="rel" d="M1020 990 V615"/>
+  <text class="mult" x="1035" y="970">0..*</text>
+  <text class="mult" x="1035" y="640">0..*</text>
+  <text class="rel-label" x="1048" y="818">calcula</text>
+
+  <path class="rel" d="M1280 1090 H1735 V920"/>
+  <text class="mult" x="1300" y="1075">0..*</text>
+  <text class="mult" x="1750" y="945">0..*</text>
+  <text class="rel-label" x="1490" y="1070">mede</text>
+</svg>

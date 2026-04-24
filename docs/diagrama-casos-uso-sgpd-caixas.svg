@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1500" viewBox="0 0 2400 1500">
+  <defs>
+    <style>
+      .bg { fill: #000000; }
+      .title { fill: #ffffff; font-family: Arial, sans-serif; font-size: 46px; font-weight: 700; text-anchor: middle; }
+      .subtitle { fill: #d8d8d8; font-family: Arial, sans-serif; font-size: 26px; font-weight: 700; text-anchor: middle; }
+      .section-label { fill: #ffffff; font-family: Arial, sans-serif; font-size: 24px; font-weight: 700; text-anchor: middle; }
+      .actor { fill: #e9e9e9; stroke: #ffffff; stroke-width: 2; }
+      .usecase { fill: #e9e9e9; stroke: #ffffff; stroke-width: 2; }
+      .actor-text { fill: #111111; font-family: Arial, sans-serif; font-size: 24px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .usecase-text { fill: #111111; font-family: Arial, sans-serif; font-size: 20px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .line { stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+      .line-solicitante { stroke: #4cc9f0; }
+      .line-responsavel { stroke: #ffb703; }
+      .line-equipe { stroke: #80ed99; }
+      .line-gestor { stroke: #c77dff; }
+      .line-departamento { stroke: #ff6b6b; }
+      .line-admin { stroke: #f4f1bb; }
+      .row-label { fill: #bbbbbb; font-family: Arial, sans-serif; font-size: 18px; font-weight: 700; text-anchor: middle; }
+      .note { fill: #d4d4d4; font-family: Arial, sans-serif; font-size: 22px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="2400" height="1500"/>
+  <text class="title" x="1200" y="72">Diagrama de Casos de Uso - SGPD</text>
+  <text class="subtitle" x="1200" y="122">Sistema de Gestão de Processos Digitais</text>
+
+  <text class="section-label" x="260" y="185">Ator</text>
+  <text class="section-label" x="1320" y="185">Funções / casos de uso relacionados</text>
+
+  <!-- Row guides -->
+  <text class="row-label" x="1200" y="235">Cada cor representa um ator e suas respectivas interações no sistema</text>
+
+  <!-- Solicitante -->
+  <rect class="actor" x="80" y="270" width="360" height="90" rx="14"/>
+  <text class="actor-text" x="260" y="315">Solicitante</text>
+  <path class="line line-solicitante" d="M440 315 H610"/>
+  <path class="line line-solicitante" d="M790 315 H890"/>
+  <path class="line line-solicitante" d="M1070 315 H1170"/>
+  <rect class="usecase" x="610" y="270" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="700" y="315">Cadastrar</text>
+  <rect class="usecase" x="890" y="270" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="980" y="304">Consultar</text>
+  <text class="usecase-text" x="980" y="330">solicitações</text>
+  <rect class="usecase" x="1170" y="270" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="1260" y="304">Filtrar</text>
+  <text class="usecase-text" x="1260" y="330">solicitações</text>
+
+  <!-- Responsável -->
+  <rect class="actor" x="80" y="455" width="360" height="100" rx="14"/>
+  <text class="actor-text" x="260" y="490">Responsável pela</text>
+  <text class="actor-text" x="260" y="520">Solicitação</text>
+  <path class="line line-responsavel" d="M440 505 H610"/>
+  <path class="line line-responsavel" d="M790 505 H890"/>
+  <path class="line line-responsavel" d="M1070 505 H1170"/>
+  <path class="line line-responsavel" d="M1350 505 H1450"/>
+  <path class="line line-responsavel" d="M1630 505 H1730"/>
+  <rect class="usecase" x="610" y="460" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="700" y="494">Consultar</text>
+  <text class="usecase-text" x="700" y="520">solicitações</text>
+  <rect class="usecase" x="890" y="460" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="980" y="505">Editar</text>
+  <rect class="usecase" x="1170" y="460" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="1260" y="494">Registrar</text>
+  <text class="usecase-text" x="1260" y="520">comentário</text>
+  <rect class="usecase" x="1450" y="460" width="180" height="90" rx="14"/>
+  <text class="usecase-text" x="1540" y="494">Avançar</text>
+  <text class="usecase-text" x="1540" y="520">status</text>
+  <rect class="usecase" x="1730" y="460" width="230" height="90" rx="14"/>
+  <text class="usecase-text" x="1845" y="494">Gerenciar tarefas</text>
+  <text class="usecase-text" x="1845" y="520">vinculadas</text>
+
+  <!-- Equipe -->
+  <rect class="actor" x="80" y="655" width="360" height="90" rx="14"/>
+  <text class="actor-text" x="260" y="700">Equipe Operacional</text>
+  <path class="line line-equipe" d="M440 700 H610"/>
+  <path class="line line-equipe" d="M840 700 H940"/>
+  <path class="line line-equipe" d="M1170 700 H1270"/>
+  <rect class="usecase" x="610" y="655" width="230" height="90" rx="14"/>
+  <text class="usecase-text" x="725" y="688">Gerenciar tarefas</text>
+  <text class="usecase-text" x="725" y="714">vinculadas</text>
+  <rect class="usecase" x="940" y="655" width="230" height="90" rx="14"/>
+  <text class="usecase-text" x="1055" y="688">Atualizar status</text>
+  <text class="usecase-text" x="1055" y="714">da tarefa</text>
+  <rect class="usecase" x="1270" y="655" width="210" height="90" rx="14"/>
+  <text class="usecase-text" x="1375" y="688">Registrar</text>
+  <text class="usecase-text" x="1375" y="714">comentário</text>
+
+  <!-- Gestor -->
+  <rect class="actor" x="80" y="840" width="360" height="90" rx="14"/>
+  <text class="actor-text" x="260" y="885">Gestor</text>
+  <path class="line line-gestor" d="M440 885 H610"/>
+  <path class="line line-gestor" d="M890 885 H990"/>
+  <path class="line line-gestor" d="M1190 885 H1290"/>
+  <rect class="usecase" x="610" y="840" width="280" height="90" rx="14"/>
+  <text class="usecase-text" x="750" y="874">Visualizar painel</text>
+  <text class="usecase-text" x="750" y="900">de indicadores</text>
+  <rect class="usecase" x="990" y="840" width="200" height="90" rx="14"/>
+  <text class="usecase-text" x="1090" y="874">Consultar</text>
+  <text class="usecase-text" x="1090" y="900">solicitações</text>
+  <rect class="usecase" x="1290" y="840" width="260" height="90" rx="14"/>
+  <text class="usecase-text" x="1420" y="874">Acompanhar</text>
+  <text class="usecase-text" x="1420" y="900">departamentos</text>
+
+  <!-- Departamento -->
+  <rect class="actor" x="80" y="1025" width="360" height="90" rx="14"/>
+  <text class="actor-text" x="260" y="1070">Departamento</text>
+  <path class="line line-departamento" d="M440 1070 H610"/>
+  <path class="line line-departamento" d="M870 1070 H970"/>
+  <path class="line line-departamento" d="M1230 1070 H1330"/>
+  <rect class="usecase" x="610" y="1025" width="260" height="90" rx="14"/>
+  <text class="usecase-text" x="740" y="1058">Acompanhar</text>
+  <text class="usecase-text" x="740" y="1084">departamentos</text>
+  <rect class="usecase" x="970" y="1025" width="260" height="90" rx="14"/>
+  <text class="usecase-text" x="1100" y="1058">Publicar</text>
+  <text class="usecase-text" x="1100" y="1084">alinhamento</text>
+  <rect class="usecase" x="1330" y="1025" width="220" height="90" rx="14"/>
+  <text class="usecase-text" x="1440" y="1058">Consultar</text>
+  <text class="usecase-text" x="1440" y="1084">solicitações</text>
+
+  <!-- Administrador -->
+  <rect class="actor" x="80" y="1210" width="360" height="100" rx="14"/>
+  <text class="actor-text" x="260" y="1245">Administrador do</text>
+  <text class="actor-text" x="260" y="1275">Sistema</text>
+  <path class="line line-admin" d="M440 1260 H610"/>
+  <path class="line line-admin" d="M870 1260 H970"/>
+  <path class="line line-admin" d="M1250 1260 H1350"/>
+  <rect class="usecase" x="610" y="1215" width="260" height="90" rx="14"/>
+  <text class="usecase-text" x="740" y="1248">Gerenciar dados</text>
+  <text class="usecase-text" x="740" y="1274">do sistema</text>
+  <rect class="usecase" x="970" y="1215" width="280" height="90" rx="14"/>
+  <text class="usecase-text" x="1110" y="1248">Visualizar painel</text>
+  <text class="usecase-text" x="1110" y="1274">de indicadores</text>
+  <rect class="usecase" x="1350" y="1215" width="260" height="90" rx="14"/>
+  <text class="usecase-text" x="1480" y="1248">Acompanhar</text>
+  <text class="usecase-text" x="1480" y="1274">departamentos</text>
+
+  <text class="note" x="1200" y="1415">Linhas coloridas e separadas por ator para evidenciar cada responsabilidade sem cruzamentos.</text>
+</svg>

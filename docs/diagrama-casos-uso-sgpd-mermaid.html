@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diagrama de Casos de Uso - SGPD</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #eef4f8;
+        font-family: Arial, sans-serif;
+      }
+
+      main {
+        width: min(1760px, calc(100vw - 48px));
+        padding: 32px;
+        border-radius: 24px;
+        background: #ffffff;
+        box-shadow: 0 24px 70px rgba(5, 36, 61, 0.12);
+      }
+
+      h1 {
+        margin: 0 0 24px;
+        color: #073154;
+        font-size: 34px;
+        text-align: center;
+      }
+
+      .mermaid {
+        display: flex;
+        justify-content: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Diagrama de Casos de Uso - Sistema de Gestão de Processos Digitais</h1>
+      <pre class="mermaid">
+flowchart LR
+  Solicitante[Solicitante]
+  Responsavel[Responsável pela Solicitação]
+  Equipe[Equipe Operacional]
+  Gestor[Gestor]
+  Departamento[Departamento]
+  Admin[Administrador do Sistema]
+
+  subgraph Sistema[Sistema de Gestão de Processos Digitais]
+    UC1((Cadastrar solicitação))
+    UC2((Consultar solicitações))
+    UC3((Filtrar solicitações))
+    UC4((Editar solicitação))
+    UC5((Registrar comentário))
+    UC6((Avançar status da solicitação))
+    UC7((Gerenciar tarefas vinculadas))
+    UC8((Atualizar status da tarefa))
+    UC9((Visualizar painel de indicadores))
+    UC10((Acompanhar departamentos))
+    UC11((Publicar alinhamento operacional))
+    UC12((Gerenciar dados do sistema))
+  end
+
+  Solicitante --- UC1
+  Solicitante --- UC2
+  Solicitante --- UC3
+
+  Responsavel --- UC2
+  Responsavel --- UC4
+  Responsavel --- UC5
+  Responsavel --- UC6
+  Responsavel --- UC7
+
+  Equipe --- UC7
+  Equipe --- UC8
+  Equipe --- UC5
+
+  Gestor --- UC9
+  Gestor --- UC2
+  Gestor --- UC10
+
+  Departamento --- UC10
+  Departamento --- UC11
+  Departamento --- UC2
+
+  Admin --- UC12
+  Admin --- UC9
+  Admin --- UC10
+      </pre>
+    </main>
+    <script type="module">
+      import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+
+      mermaid.initialize({
+        startOnLoad: true,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: '#e8f5fd',
+          primaryBorderColor: '#238ac6',
+          primaryTextColor: '#05243d',
+          lineColor: '#395468',
+          fontFamily: 'Arial',
+          clusterBkg: '#ffffff',
+          clusterBorder: '#1c5d8f',
+          titleColor: '#073154'
+        },
+        flowchart: {
+          curve: 'linear',
+          nodeSpacing: 42,
+          rankSpacing: 80
+        }
+      });
+    </script>
+  </body>
+</html>

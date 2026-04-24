@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="2500" viewBox="0 0 1500 2500">
+  <defs>
+    <style>
+      .bg { fill: #17191a; }
+      .title { fill: #f2f7fb; font-family: Arial, sans-serif; font-size: 48px; font-weight: 700; text-anchor: middle; }
+      .system { fill: none; stroke: #3f515a; stroke-width: 4; }
+      .system-title { fill: #dce8ef; font-family: Arial, sans-serif; font-size: 30px; text-anchor: middle; }
+      .actor { fill: #202527; stroke: #4d6570; stroke-width: 3; rx: 10; }
+      .actor-text { fill: #ffffff; font-family: Arial, sans-serif; font-size: 29px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .usecase { fill: #1d2224; stroke: #4d6570; stroke-width: 3.2; }
+      .usecase-text { fill: #ffffff; font-family: Arial, sans-serif; font-size: 29px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+      .line { stroke: #768892; stroke-width: 3.2; stroke-opacity: 0.8; fill: none; }
+      .note { fill: #c2d2da; font-family: Arial, sans-serif; font-size: 22px; text-anchor: middle; }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1500" height="2500"/>
+  <text class="title" x="750" y="72">Diagrama de Casos de Uso - SGPD</text>
+
+  <rect class="system" x="650" y="125" width="650" height="2270" rx="16"/>
+  <text class="system-title" x="975" y="168">Sistema de Gestão de Processos Digitais</text>
+
+  <!-- Actors -->
+  <rect class="actor" x="180" y="255" width="360" height="82"/>
+  <text class="actor-text" x="360" y="296">Solicitante</text>
+
+  <rect class="actor" x="110" y="735" width="500" height="100"/>
+  <text class="actor-text" x="360" y="770">Responsável pela</text>
+  <text class="actor-text" x="360" y="810">Solicitação</text>
+
+  <rect class="actor" x="125" y="1260" width="470" height="82"/>
+  <text class="actor-text" x="360" y="1301">Equipe Operacional</text>
+
+  <rect class="actor" x="235" y="1590" width="250" height="82"/>
+  <text class="actor-text" x="360" y="1631">Gestor</text>
+
+  <rect class="actor" x="170" y="1840" width="380" height="82"/>
+  <text class="actor-text" x="360" y="1881">Departamento</text>
+
+  <rect class="actor" x="70" y="2070" width="580" height="82"/>
+  <text class="actor-text" x="360" y="2111">Administrador do Sistema</text>
+
+  <!-- Associations -->
+  <path class="line" d="M540 296 L735 270"/>
+  <path class="line" d="M540 296 L735 455"/>
+  <path class="line" d="M540 296 L735 630"/>
+
+  <path class="line" d="M610 785 L735 455"/>
+  <path class="line" d="M610 785 L735 810"/>
+  <path class="line" d="M610 785 L735 995"/>
+  <path class="line" d="M610 785 L735 1180"/>
+  <path class="line" d="M610 785 L735 1365"/>
+
+  <path class="line" d="M595 1301 L735 995"/>
+  <path class="line" d="M595 1301 L735 1365"/>
+  <path class="line" d="M595 1301 L735 1180"/>
+
+  <path class="line" d="M485 1631 L735 455"/>
+  <path class="line" d="M485 1631 L735 1545"/>
+  <path class="line" d="M485 1631 L735 1725"/>
+
+  <path class="line" d="M550 1881 L735 455"/>
+  <path class="line" d="M550 1881 L735 1725"/>
+  <path class="line" d="M550 1881 L735 1910"/>
+
+  <path class="line" d="M650 2111 L735 1545"/>
+  <path class="line" d="M650 2111 L735 1725"/>
+  <path class="line" d="M650 2111 L735 2095"/>
+
+  <!-- Use cases -->
+  <ellipse class="usecase" cx="970" cy="270" rx="220" ry="88"/>
+  <text class="usecase-text" x="970" y="270">Cadastrar solicitação</text>
+
+  <ellipse class="usecase" cx="970" cy="455" rx="225" ry="92"/>
+  <text class="usecase-text" x="970" y="455">Consultar solicitações</text>
+
+  <ellipse class="usecase" cx="970" cy="630" rx="210" ry="86"/>
+  <text class="usecase-text" x="970" y="630">Filtrar solicitações</text>
+
+  <ellipse class="usecase" cx="970" cy="810" rx="210" ry="86"/>
+  <text class="usecase-text" x="970" y="810">Editar solicitação</text>
+
+  <ellipse class="usecase" cx="970" cy="995" rx="225" ry="92"/>
+  <text class="usecase-text" x="970" y="995">Registrar comentário</text>
+
+  <ellipse class="usecase" cx="970" cy="1180" rx="245" ry="96"/>
+  <text class="usecase-text" x="970" y="1160">Avançar status da</text>
+  <text class="usecase-text" x="970" y="1200">solicitação</text>
+
+  <ellipse class="usecase" cx="970" cy="1365" rx="250" ry="98"/>
+  <text class="usecase-text" x="970" y="1345">Gerenciar tarefas</text>
+  <text class="usecase-text" x="970" y="1385">vinculadas</text>
+
+  <ellipse class="usecase" cx="970" cy="1545" rx="245" ry="96"/>
+  <text class="usecase-text" x="970" y="1525">Atualizar status da</text>
+  <text class="usecase-text" x="970" y="1565">tarefa</text>
+
+  <ellipse class="usecase" cx="970" cy="1725" rx="260" ry="100"/>
+  <text class="usecase-text" x="970" y="1705">Visualizar painel de</text>
+  <text class="usecase-text" x="970" y="1745">indicadores</text>
+
+  <ellipse class="usecase" cx="970" cy="1910" rx="250" ry="98"/>
+  <text class="usecase-text" x="970" y="1890">Acompanhar</text>
+  <text class="usecase-text" x="970" y="1930">departamentos</text>
+
+  <ellipse class="usecase" cx="970" cy="2095" rx="270" ry="102"/>
+  <text class="usecase-text" x="970" y="2075">Publicar alinhamento</text>
+  <text class="usecase-text" x="970" y="2115">operacional</text>
+
+  <ellipse class="usecase" cx="970" cy="2290" rx="260" ry="100"/>
+  <text class="usecase-text" x="970" y="2270">Gerenciar dados do</text>
+  <text class="usecase-text" x="970" y="2310">sistema</text>
+
+  <text class="note" x="750" y="2460">Versão legível em estilo Mermaid escuro para upload da etapa de diagrama UML.</text>
+</svg>
